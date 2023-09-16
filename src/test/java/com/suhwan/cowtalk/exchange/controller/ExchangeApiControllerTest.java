@@ -4,27 +4,26 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.suhwan.cowtalk.exchange.entity.Exchange;
 import com.suhwan.cowtalk.exchange.model.ExchangeResponse;
 import com.suhwan.cowtalk.exchange.service.ExchangeService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
+@WebMvcTest(ExchangeApiController.class)
 class ExchangeApiControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -32,11 +31,6 @@ class ExchangeApiControllerTest {
 
     @MockBean
     private ExchangeService exchangeService;
-
-    @BeforeEach
-    public void init() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ExchangeApiController(exchangeService)).build();
-    }
 
     @Test
     void 거래소가_추가된다() throws Exception {
@@ -55,5 +49,22 @@ class ExchangeApiControllerTest {
 
         // then
         verify(exchangeService, times(1)).insertExchange(anyString());
+    }
+
+    @Test
+    void 거래소를_조회한다() throws Exception {
+        // given
+        given(exchangeService.readExchange(anyLong()))
+                .willReturn(Exchange.builder()
+                        .id(1L)
+                        .name("코인빗")
+                        .build());
+
+        // then
+        mockMvc.perform(get("/api/exchange/1"))
+                .andDo(print())
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.name").value("코인빗"))
+                .andExpect(status().isOk());
     }
 }
