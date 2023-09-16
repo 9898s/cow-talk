@@ -2,23 +2,22 @@ package com.suhwan.cowtalk.exchange.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.suhwan.cowtalk.exchange.entity.Exchange;
-import com.suhwan.cowtalk.exchange.model.ExchangeResponse;
 import com.suhwan.cowtalk.exchange.service.ExchangeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ExchangeApiController.class)
 class ExchangeApiControllerTest {
@@ -33,22 +32,21 @@ class ExchangeApiControllerTest {
     private ExchangeService exchangeService;
 
     @Test
-    void 거래소가_추가된다() throws Exception {
+    void 거래소를_추가한다() throws Exception {
         // given
-        String name = "코인빗";
-        Exchange exchange = Exchange.builder()
-                .name(name)
-                .build();
-
-        given(exchangeService.insertExchange(anyString())).willReturn(exchange);
-
-        // when
-        mockMvc.perform(post("/api/exchange/" + name))
-                .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(ExchangeResponse.of(exchange))));
+        given(exchangeService.insertExchange(anyString()))
+                .willReturn(Exchange.builder()
+                        .id(1L)
+                        .name("코인빗")
+                        .build());
 
         // then
-        verify(exchangeService, times(1)).insertExchange(anyString());
+        mockMvc.perform(post("/api/exchange/코인빗")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("코인빗"))
+                .andDo(print());
     }
 
     @Test
