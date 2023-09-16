@@ -28,4 +28,11 @@ public class ExchangeService {
                 .createDate(LocalDateTime.now())
                 .build());
     }
+
+    // 거래소 정보
+    public Exchange readExchange(Long id) {
+        // 예외처리 임시
+        return exchangeRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 번호입니다."));
+    }
 }
