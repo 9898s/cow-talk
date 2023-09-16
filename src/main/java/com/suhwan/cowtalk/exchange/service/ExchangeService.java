@@ -32,6 +32,7 @@ public class ExchangeService {
     }
 
     // 거래소 정보
+    @Transactional(readOnly = true)
     public Exchange readExchange(Long id) {
         // 예외처리 임시
         return exchangeRepository.findById(id)
@@ -39,6 +40,7 @@ public class ExchangeService {
     }
 
     // 거래소 수정
+    @Transactional
     public Exchange updateExchange(ExchangeEditRequest request) {
         Exchange exchange = exchangeRepository.findById(request.getId())
                 .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 번호입니다."));
