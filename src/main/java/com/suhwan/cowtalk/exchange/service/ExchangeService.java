@@ -1,6 +1,7 @@
 package com.suhwan.cowtalk.exchange.service;
 
 import com.suhwan.cowtalk.exchange.entity.Exchange;
+import com.suhwan.cowtalk.exchange.model.ExchangeEditRequest;
 import com.suhwan.cowtalk.exchange.repository.ExchangeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,5 +35,14 @@ public class ExchangeService {
         // 예외처리 임시
         return exchangeRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 번호입니다."));
+    }
+
+    // 거래소 수정
+    public Exchange updateExchange(ExchangeEditRequest request) {
+        Exchange exchange = exchangeRepository.findById(request.getId())
+                .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 번호입니다."));
+
+        exchange.update(request.getName(), LocalDateTime.now());
+        return exchange;
     }
 }

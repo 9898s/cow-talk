@@ -1,6 +1,8 @@
 package com.suhwan.cowtalk.exchange.controller;
 
 import com.suhwan.cowtalk.exchange.entity.Exchange;
+import com.suhwan.cowtalk.exchange.model.ExchangeEditRequest;
+import com.suhwan.cowtalk.exchange.model.ExchangeEditResponse;
 import com.suhwan.cowtalk.exchange.model.ExchangeInfoResponse;
 import com.suhwan.cowtalk.exchange.model.ExchangeResponse;
 import com.suhwan.cowtalk.exchange.service.ExchangeService;
@@ -25,5 +27,11 @@ public class ExchangeApiController {
     public ResponseEntity<?> infoExchange(@PathVariable Long id) {
         Exchange exchange = exchangeService.readExchange(id);
         return ResponseEntity.ok().body(ExchangeInfoResponse.of(exchange));
+    }
+
+    @PutMapping("/edit")
+    public ResponseEntity<?> editExchange(@RequestBody ExchangeEditRequest request) {
+        Exchange exchange = exchangeService.updateExchange(request);
+        return ResponseEntity.ok().body(ExchangeEditResponse.of(exchange));
     }
 }

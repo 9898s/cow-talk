@@ -30,4 +30,9 @@ public class Exchange {
 
     @Column
     private LocalDateTime deleteDate;
+
+    public void update(String name, LocalDateTime updateDate) {
+        this.name = name;
+        this.updateDate = updateDate;
+    }
 }
