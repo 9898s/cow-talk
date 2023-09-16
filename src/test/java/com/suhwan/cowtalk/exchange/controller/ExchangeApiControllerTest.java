@@ -3,7 +3,6 @@ package com.suhwan.cowtalk.exchange.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.suhwan.cowtalk.exchange.entity.Exchange;
 import com.suhwan.cowtalk.exchange.model.ExchangeEditRequest;
-import com.suhwan.cowtalk.exchange.model.ExchangeEditResponse;
 import com.suhwan.cowtalk.exchange.service.ExchangeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +91,24 @@ class ExchangeApiControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value("1"))
                 .andExpect(jsonPath("$.name").value("코빗"))
+                .andDo(print());
+    }
+
+    @Test
+    void 거래소를_삭제한다() throws Exception {
+        // given
+        given(exchangeService.deleteExchange(anyLong()))
+                .willReturn(Exchange.builder()
+                        .id(1L)
+                        .name("코인빗")
+                        .build());
+
+        // then
+        mockMvc.perform(delete("/api/exchange/1")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.name").value("코인빗"))
                 .andDo(print());
     }
 }
