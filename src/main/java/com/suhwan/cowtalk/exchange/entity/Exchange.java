@@ -35,4 +35,8 @@ public class Exchange {
         this.name = name;
         this.updateDate = updateDate;
     }
+
+    public void delete(LocalDateTime deleteDate) {
+        this.deleteDate = deleteDate;
+    }
 }

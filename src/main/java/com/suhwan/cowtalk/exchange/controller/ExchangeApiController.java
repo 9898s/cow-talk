@@ -1,10 +1,7 @@
 package com.suhwan.cowtalk.exchange.controller;
 
 import com.suhwan.cowtalk.exchange.entity.Exchange;
-import com.suhwan.cowtalk.exchange.model.ExchangeEditRequest;
-import com.suhwan.cowtalk.exchange.model.ExchangeEditResponse;
-import com.suhwan.cowtalk.exchange.model.ExchangeInfoResponse;
-import com.suhwan.cowtalk.exchange.model.ExchangeResponse;
+import com.suhwan.cowtalk.exchange.model.*;
 import com.suhwan.cowtalk.exchange.service.ExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,5 +30,11 @@ public class ExchangeApiController {
     public ResponseEntity<?> editExchange(@RequestBody ExchangeEditRequest request) {
         Exchange exchange = exchangeService.updateExchange(request);
         return ResponseEntity.ok().body(ExchangeEditResponse.of(exchange));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> removeExchange(@PathVariable Long id) {
+        Exchange exchange = exchangeService.deleteExchange(id);
+        return ResponseEntity.ok().body(ExchangeDeleteResponse.of(exchange));
     }
 }

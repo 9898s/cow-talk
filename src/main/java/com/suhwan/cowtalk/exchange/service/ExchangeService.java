@@ -6,6 +6,7 @@ import com.suhwan.cowtalk.exchange.repository.ExchangeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -43,6 +44,16 @@ public class ExchangeService {
                 .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 번호입니다."));
 
         exchange.update(request.getName(), LocalDateTime.now());
+        return exchange;
+    }
+
+    // 거래소 삭제
+    @Transactional
+    public Exchange deleteExchange(Long id) {
+        Exchange exchange = exchangeRepository.findById(id)
+                .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 번호입니다."));
+
+        exchange.delete(LocalDateTime.now());
         return exchange;
     }
 }
