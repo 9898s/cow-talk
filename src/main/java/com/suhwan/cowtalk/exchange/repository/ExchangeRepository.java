@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface ExchangeRepository extends JpaRepository<Exchange, Long> {
 
-    Optional<Exchange> findByName(String name);
+    Optional<Exchange> findByEnglishName(String englishName);
 }

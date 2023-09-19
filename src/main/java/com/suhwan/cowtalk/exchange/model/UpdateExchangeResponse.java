@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 public class UpdateExchangeResponse {
 
   private Long id;
-  private String name;
+  private String koreanName;
+  private String englishName;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime updateDate;
@@ -22,7 +23,8 @@ public class UpdateExchangeResponse {
   public static UpdateExchangeResponse from(ExchangeDto exchange) {
     return UpdateExchangeResponse.builder()
         .id(exchange.getId())
-        .name(exchange.getName())
+        .koreanName(exchange.getKoreanName())
+        .englishName(exchange.getEnglishName())
         .updateDate(exchange.getUpdateDate())
         .build();
   }

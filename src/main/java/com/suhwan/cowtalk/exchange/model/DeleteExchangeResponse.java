@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 public class DeleteExchangeResponse {
 
   private Long id;
-  private String name;
+  private String koreanName;
+  private String englishName;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime deleteDate;
@@ -22,7 +23,8 @@ public class DeleteExchangeResponse {
   public static DeleteExchangeResponse from(ExchangeDto exchangeDto) {
     return DeleteExchangeResponse.builder()
         .id(exchangeDto.getId())
-        .name(exchangeDto.getName())
+        .koreanName(exchangeDto.getKoreanName())
+        .englishName(exchangeDto.getEnglishName())
         .deleteDate(exchangeDto.getDeleteDate())
         .build();
   }
