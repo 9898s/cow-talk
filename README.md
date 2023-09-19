@@ -79,9 +79,7 @@
 
 - 가상화폐 기능
     - 외부 API를 이용해서 가상화폐의 데이터를 조회합니다.
-        - 업비트(https://docs.upbit.com/reference)
-        - 빗썸(https://apidocs.bithumb.com/reference)
-        - CoinMarketCap(https://coinmarketcap.com/api/documentation/v1/)
+        - CoinGecko(https://www.coingecko.com/en/api/documentation)
     - 업비트/빗썸에 상장된 가상화폐의 데이터는 MySQL에 모두 저장됩니다. (Spring Batch 활용)
         - 일자, 종가(KRW), 전일대비, 거래량(KRW)
     - 새로 상장 또는 폐지된 코인을 확인하기 위해 주기적으로 업데이트 로직이 실행됩니다. (Scheduler 활용)
