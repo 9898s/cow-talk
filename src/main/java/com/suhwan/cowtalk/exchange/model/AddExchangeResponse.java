@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 public class AddExchangeResponse {
 
   private Long id;
-  private String name;
+  private String koreanName;
+  private String englishName;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime createDate;
@@ -22,7 +23,8 @@ public class AddExchangeResponse {
   public static AddExchangeResponse from(ExchangeDto exchangeDto) {
     return AddExchangeResponse.builder()
         .id(exchangeDto.getId())
-        .name(exchangeDto.getName())
+        .koreanName(exchangeDto.getKoreanName())
+        .englishName(exchangeDto.getEnglishName())
         .createDate(exchangeDto.getCreateDate())
         .build();
   }

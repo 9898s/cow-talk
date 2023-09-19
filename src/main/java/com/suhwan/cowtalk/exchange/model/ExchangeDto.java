@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 public class ExchangeDto {
 
   private Long id;
-  private String name;
+  private String koreanName;
+  private String englishName;
   private LocalDateTime createDate;
   private LocalDateTime updateDate;
   private LocalDateTime deleteDate;
@@ -22,7 +23,8 @@ public class ExchangeDto {
   public static ExchangeDto fromEntity(Exchange exchange) {
     return ExchangeDto.builder()
         .id(exchange.getId())
-        .name(exchange.getName())
+        .koreanName(exchange.getKoreanName())
+        .englishName(exchange.getEnglishName())
         .createDate(exchange.getCreateDate())
         .updateDate(exchange.getUpdateDate())
         .deleteDate(exchange.getDeleteDate())

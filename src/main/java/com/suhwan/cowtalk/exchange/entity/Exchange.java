@@ -23,7 +23,10 @@ public class Exchange {
   private Long id;
 
   @Column
-  private String name;
+  private String koreanName;
+
+  @Column
+  private String englishName;
 
   @Column
   private LocalDateTime createDate;
@@ -34,8 +37,9 @@ public class Exchange {
   @Column
   private LocalDateTime deleteDate;
 
-  public void update(String name, LocalDateTime updateDate) {
-    this.name = name;
+  public void update(String koreanName, String englishName, LocalDateTime updateDate) {
+    this.koreanName = koreanName;
+    this.englishName = englishName;
     this.updateDate = updateDate;
   }
 

@@ -5,5 +5,6 @@ import lombok.Getter;
 @Getter
 public class AddExchangeRequest {
 
-  private String name;
+  private String koreanName;
+  private String englishName;
 }

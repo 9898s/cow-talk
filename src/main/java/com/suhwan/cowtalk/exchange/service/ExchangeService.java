@@ -20,13 +20,14 @@ public class ExchangeService {
 
   // 거래소 추가
   public ExchangeDto createExchange(AddExchangeRequest request) {
-    if (exchangeRepository.findByName(request.getName()).isPresent()) {
+    if (exchangeRepository.findByEnglishName(request.getEnglishName()).isPresent()) {
       throw new IllegalStateException("이미 존재하는 거래소입니다.");
     }
 
     return ExchangeDto.fromEntity(
         exchangeRepository.save(Exchange.builder()
-            .name(request.getName())
+            .koreanName(request.getKoreanName())
+            .englishName(request.getEnglishName())
             .createDate(LocalDateTime.now())
             .build())
     );
@@ -47,7 +48,7 @@ public class ExchangeService {
     Exchange exchange = exchangeRepository.findById(id)
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 번호입니다."));
 
-    exchange.update(request.getName(), LocalDateTime.now());
+    exchange.update(request.getKoreanName(), request.getEnglishName(), LocalDateTime.now());
 
     return ExchangeDto.fromEntity(exchange);
   }
