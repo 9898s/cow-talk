@@ -1,12 +1,11 @@
 package com.suhwan.cowtalk.exchange.controller;
 
-import com.suhwan.cowtalk.exchange.entity.Exchange;
-import com.suhwan.cowtalk.exchange.model.ExchangeAddRequest;
-import com.suhwan.cowtalk.exchange.model.ExchangeAddResponse;
-import com.suhwan.cowtalk.exchange.model.ExchangeDeleteResponse;
-import com.suhwan.cowtalk.exchange.model.ExchangeEditRequest;
-import com.suhwan.cowtalk.exchange.model.ExchangeEditResponse;
-import com.suhwan.cowtalk.exchange.model.ExchangeInfoResponse;
+import com.suhwan.cowtalk.exchange.model.AddExchangeRequest;
+import com.suhwan.cowtalk.exchange.model.AddExchangeResponse;
+import com.suhwan.cowtalk.exchange.model.DeleteExchangeResponse;
+import com.suhwan.cowtalk.exchange.model.ExchangeResponse;
+import com.suhwan.cowtalk.exchange.model.UpdateExchangeRequest;
+import com.suhwan.cowtalk.exchange.model.UpdateExchangeResponse;
 import com.suhwan.cowtalk.exchange.service.ExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,27 +25,32 @@ public class ExchangeApiController {
 
   private final ExchangeService exchangeService;
 
-  @PostMapping("/add")
-  public ResponseEntity<?> addExchange(@RequestBody ExchangeAddRequest request) {
-    ExchangeAddResponse response = exchangeService.insertExchange(request);
-    return ResponseEntity.ok().body(response);
+  @PostMapping
+  public ResponseEntity<?> createExchange(@RequestBody AddExchangeRequest request) {
+
+    return ResponseEntity.ok()
+        .body(AddExchangeResponse.from(exchangeService.createExchange(request)));
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<?> infoExchange(@PathVariable Long id) {
-    Exchange exchange = exchangeService.readExchange(id);
-    return ResponseEntity.ok().body(ExchangeInfoResponse.of(exchange));
+  public ResponseEntity<?> getExchange(@PathVariable Long id) {
+
+    return ResponseEntity.ok()
+        .body(ExchangeResponse.from(exchangeService.getExchange(id)));
   }
 
-  @PutMapping("/edit")
-  public ResponseEntity<?> editExchange(@RequestBody ExchangeEditRequest request) {
-    Exchange exchange = exchangeService.updateExchange(request);
-    return ResponseEntity.ok().body(ExchangeEditResponse.of(exchange));
+  @PutMapping("/{id}")
+  public ResponseEntity<?> updateExchange(@PathVariable Long id,
+      @RequestBody UpdateExchangeRequest request) {
+
+    return ResponseEntity.ok()
+        .body(UpdateExchangeResponse.from(exchangeService.updateExchange(id, request)));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<?> removeExchange(@PathVariable Long id) {
-    Exchange exchange = exchangeService.deleteExchange(id);
-    return ResponseEntity.ok().body(ExchangeDeleteResponse.of(exchange));
+  public ResponseEntity<?> deleteExchange(@PathVariable Long id) {
+
+    return ResponseEntity.ok()
+        .body(DeleteExchangeResponse.from(exchangeService.deleteExchange(id)));
   }
 }
