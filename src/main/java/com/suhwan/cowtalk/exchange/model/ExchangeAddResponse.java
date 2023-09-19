@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Getter
-public class ExchangeResponse {
+public class ExchangeAddResponse {
 
     private Long id;
     private String name;
@@ -21,8 +21,8 @@ public class ExchangeResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createDate;
 
-    public static ExchangeResponse of(Exchange exchange) {
-        return ExchangeResponse.builder()
+    public static ExchangeAddResponse of(Exchange exchange) {
+        return ExchangeAddResponse.builder()
                 .id(exchange.getId())
                 .name(exchange.getName())
                 .createDate(exchange.getCreateDate())
