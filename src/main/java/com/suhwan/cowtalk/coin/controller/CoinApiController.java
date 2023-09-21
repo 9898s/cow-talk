@@ -1,11 +1,13 @@
 package com.suhwan.cowtalk.coin.controller;
 
 import com.suhwan.cowtalk.coin.model.CoinDto;
+import com.suhwan.cowtalk.coin.model.CoinResponse;
 import com.suhwan.cowtalk.coin.model.DeleteCoinResponse;
 import com.suhwan.cowtalk.coin.service.CoinService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class CoinApiController {
 
   private final CoinService coinService;
+
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getCoin(@PathVariable Long id) {
+    CoinDto coinDto = coinService.getCoin(id);
+    return ResponseEntity.ok().body(CoinResponse.from(coinDto));
+  }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<?> deleteCoin(@PathVariable Long id) {

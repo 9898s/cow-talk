@@ -13,6 +13,15 @@ public class CoinService {
 
   private final CoinRepository coinRepository;
 
+  // 특정 코인 조회
+  @Transactional(readOnly = true)
+  public CoinDto getCoin(Long id) {
+    Coin coin = coinRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 코인 번호입니다."));
+
+    return CoinDto.fromEntity(coin);
+  }
+
   // 코인 삭제
   @Transactional
   public CoinDto deleteCoin(Long id) {
