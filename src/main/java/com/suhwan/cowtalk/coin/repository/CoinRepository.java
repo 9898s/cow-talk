@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface CoinRepository extends JpaRepository<Coin, Long> {
 
   Optional<Coin> findByInitialAndExchange(String initial, Exchange exchange);
+
+  boolean existsByIdAndDeleteDateIsNull(Long id);
 }

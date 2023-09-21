@@ -47,4 +47,8 @@ public class Coin {
   public void update() {
     this.updateDate = LocalDateTime.now();
   }
+
+  public void delete() {
+    this.deleteDate = LocalDateTime.now();
+  }
 }
