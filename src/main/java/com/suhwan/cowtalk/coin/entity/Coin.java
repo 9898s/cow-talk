@@ -43,4 +43,8 @@ public class Coin {
 
   @Column
   private LocalDateTime deleteDate;
+
+  public void update() {
+    this.updateDate = LocalDateTime.now();
+  }
 }
