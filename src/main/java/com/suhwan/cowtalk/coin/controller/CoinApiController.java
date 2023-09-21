@@ -2,8 +2,8 @@ package com.suhwan.cowtalk.coin.controller;
 
 import com.suhwan.cowtalk.coin.model.CoinDto;
 import com.suhwan.cowtalk.coin.model.CoinResponse;
-import com.suhwan.cowtalk.coin.model.CoinResponseList;
 import com.suhwan.cowtalk.coin.model.DeleteCoinResponse;
+import com.suhwan.cowtalk.coin.model.PageCoinResponse;
 import com.suhwan.cowtalk.coin.service.CoinService;
 import com.suhwan.cowtalk.exchange.service.ExchangeService;
 import java.util.List;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -31,14 +32,19 @@ public class CoinApiController {
   }
 
   @GetMapping("/exchange/{exchangeId}")
-  public ResponseEntity<?> getCoinList(@PathVariable Long exchangeId) {
-    List<CoinDto> coinDtoList = coinService.getCoinList(exchangeId);
+  public ResponseEntity<?> getCoinList(
+      @PathVariable Long exchangeId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ) {
+    List<CoinDto> coinDtoList = coinService.getCoinList(exchangeId, page, size);
 
     List<CoinResponse> coinResponseList = coinDtoList.stream()
         .map(CoinResponse::from)
         .collect(Collectors.toList());
 
-    return ResponseEntity.ok().body(CoinResponseList.of(coinResponseList.size(), coinResponseList));
+    return ResponseEntity.ok()
+        .body(PageCoinResponse.of(coinResponseList.size(), page, size, coinResponseList));
   }
 
   @DeleteMapping("/{id}")

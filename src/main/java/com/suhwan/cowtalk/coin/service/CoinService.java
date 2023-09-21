@@ -8,6 +8,9 @@ import com.suhwan.cowtalk.exchange.repository.ExchangeRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,13 +31,14 @@ public class CoinService {
   }
 
   // 거래소에 상장된 코인 조회
-  public List<CoinDto> getCoinList(Long exchangeId) {
+  public List<CoinDto> getCoinList(Long exchangeId, int page, int size) {
     Exchange exchange = exchangeRepository.findById(exchangeId)
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 번호입니다."));
 
-    List<Coin> coinList = coinRepository.findAllByExchange(exchange);
+    Pageable pageable = PageRequest.of(page, size);
+    Page<Coin> coinPage = coinRepository.findAllByExchange(exchange, pageable);
 
-    return coinList.stream()
+    return coinPage.stream()
         .map(CoinDto::fromEntity)
         .collect(Collectors.toList());
   }
@@ -45,7 +49,7 @@ public class CoinService {
     Coin coin = coinRepository.findById(id)
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 코인 번호입니다."));
 
-    if (!coinRepository.existsByIdAndDeleteDateIsNull(id)) {
+    if (coin.getDeleteDate() != null) {
       throw new IllegalStateException("이미 삭제된 코인 번호입니다.");
     }
 

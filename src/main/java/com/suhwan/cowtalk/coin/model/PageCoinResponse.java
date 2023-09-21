@@ -10,15 +10,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Getter
-public class CoinResponseList {
+public class PageCoinResponse {
 
   private int totalCount;
+  private int currentPage;
+  private int size;
   private List<CoinResponse> coinResponseList;
 
-  public static CoinResponseList of(int totalCount, List<CoinResponse> coinResponseList) {
+  public static PageCoinResponse of(int totalCount, int currentPage, int size, List<CoinResponse> coinResponseList) {
 
-    return CoinResponseList.builder()
+    return PageCoinResponse.builder()
         .totalCount(totalCount)
+        .currentPage(currentPage)
+        .size(size)
         .coinResponseList(coinResponseList)
         .build();
   }
