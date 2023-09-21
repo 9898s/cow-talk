@@ -8,9 +8,9 @@ import com.suhwan.cowtalk.coin.repository.CoinRepository;
 import com.suhwan.cowtalk.exchange.entity.Exchange;
 import com.suhwan.cowtalk.exchange.repository.ExchangeRepository;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,27 +32,19 @@ public class CoinGeckoApiService {
     Exchange exchange = exchangeRepository.findByEnglishName(exchangeName)
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 이름입니다."));
 
-    List<CoinDto> coinDtoList = new ArrayList<>();
     String apiUrl = String.format(COIN_GECKO_API_URL, exchangeName);
 
     CoinGeckoApiResponse coinGeckoApiResponse = getCoinGeckoApiResponse(apiUrl, page);
     List<CoinGeckoApiTicker> coinGeckoApiTickerList = coinGeckoApiResponse.getCoinGeckoApiTickerList();
 
-    for (CoinGeckoApiTicker ticker : coinGeckoApiTickerList) {
-      if (!ticker.getTarget().equals("KRW")) {
-        continue;
-      }
-
-      coinDtoList.add(
-          CoinDto.builder()
-              .initial(ticker.getInitial())
-              .name(ticker.getName())
-              .exchange(exchange)
-              .build()
-      );
-    }
-
-    return coinDtoList;
+    return coinGeckoApiTickerList.stream()
+        .filter(ticker -> "KRW".equals(ticker.getTarget()))
+        .map(ticker -> CoinDto.builder()
+            .initial(ticker.getInitial())
+            .name(ticker.getName())
+            .exchange(exchange)
+            .build())
+        .collect(Collectors.toList());
   }
 
   private CoinGeckoApiResponse getCoinGeckoApiResponse(String apiUrl, int i) {
