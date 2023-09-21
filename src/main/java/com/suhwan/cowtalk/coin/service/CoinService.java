@@ -3,6 +3,10 @@ package com.suhwan.cowtalk.coin.service;
 import com.suhwan.cowtalk.coin.entity.Coin;
 import com.suhwan.cowtalk.coin.model.CoinDto;
 import com.suhwan.cowtalk.coin.repository.CoinRepository;
+import com.suhwan.cowtalk.exchange.entity.Exchange;
+import com.suhwan.cowtalk.exchange.repository.ExchangeRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CoinService {
 
   private final CoinRepository coinRepository;
+  private final ExchangeRepository exchangeRepository;
 
   // 특정 코인 조회
   @Transactional(readOnly = true)
@@ -20,6 +25,18 @@ public class CoinService {
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 코인 번호입니다."));
 
     return CoinDto.fromEntity(coin);
+  }
+
+  // 거래소에 상장된 코인 조회
+  public List<CoinDto> getCoinList(Long exchangeId) {
+    Exchange exchange = exchangeRepository.findById(exchangeId)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 번호입니다."));
+
+    List<Coin> coinList = coinRepository.findAllByExchange(exchange);
+
+    return coinList.stream()
+        .map(CoinDto::fromEntity)
+        .collect(Collectors.toList());
   }
 
   // 코인 삭제
