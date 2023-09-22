@@ -17,7 +17,8 @@ public class PageCoinResponse {
   private int size;
   private List<CoinResponse> coinResponseList;
 
-  public static PageCoinResponse of(int totalCount, int currentPage, int size, List<CoinResponse> coinResponseList) {
+  public static PageCoinResponse of(int totalCount, int currentPage, int size,
+      List<CoinResponse> coinResponseList) {
 
     return PageCoinResponse.builder()
         .totalCount(totalCount)
