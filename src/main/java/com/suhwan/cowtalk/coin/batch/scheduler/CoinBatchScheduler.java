@@ -20,8 +20,8 @@ public class CoinBatchScheduler {
   private final Job fetchUpbitCoinJob;
   private final Job fetchBithumbCoinJob;
 
-  //  @Scheduled(fixedRate = 1000 * 60, initialDelay = 1000 * 60)
-  @Scheduled(cron = "0 0 * * * *")
+  @Scheduled(fixedRate = 1000 * 60, initialDelay = 1000 * 60)
+//  @Scheduled(cron = "0 0 * * * *")
   public void executeFetchUpbitCoinJob() {
     try {
       log.info("fetchUpbitCoinJob start");
@@ -38,8 +38,8 @@ public class CoinBatchScheduler {
     }
   }
 
-  //  @Scheduled(fixedRate = 1000 * 30, initialDelay = 1000 * 30)
-  @Scheduled(cron = "0 30 * * * *")
+  @Scheduled(fixedRate = 1000 * 60, initialDelay = 1000 * 120)
+//  @Scheduled(cron = "0 30 * * * *")
   public void executeFetchBithumbCoinJob() {
     try {
       log.info("fetchBithumbCoinJob start");

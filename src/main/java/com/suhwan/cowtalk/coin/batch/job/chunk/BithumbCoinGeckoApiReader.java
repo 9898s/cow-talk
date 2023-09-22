@@ -11,24 +11,25 @@ import org.springframework.batch.item.ItemReader;
 @RequiredArgsConstructor
 public class BithumbCoinGeckoApiReader implements ItemReader<List<CoinDto>> {
 
-  private final CoinGeckoApiService coinGeckoApiService;
+  private static final String EXCHANGE_NAME = "bithumb";
 
-  private static final int MAX_PAGES = 5;
+  private final CoinGeckoApiService coinGeckoApiService;
 
   private int page = 0;
 
   @Override
   public List<CoinDto> read() throws Exception {
-    page++;
 
-    if (page >= MAX_PAGES) {
+    List<CoinDto> coinDtoList = coinGeckoApiService.fetchCoinList(EXCHANGE_NAME, page);
+
+    if (coinDtoList.isEmpty()) {
       return null;
     }
 
-    String exchangeName = "bithumb";
-    log.info("{} coin fetch page = {}", exchangeName, page);
-    List<CoinDto> coinDtoList = coinGeckoApiService.fetchCoinList(exchangeName, page);
-    log.info("{} coin fetch data size =  {}", exchangeName, coinDtoList.size());
+    log.info("{} coin fetch page = {}", EXCHANGE_NAME, page);
+    log.info("{} coin fetch data size =  {}", EXCHANGE_NAME, coinDtoList.size());
+
+    page++;
     return coinDtoList;
   }
 }

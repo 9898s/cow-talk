@@ -22,6 +22,8 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class CoinBatchConfiguration {
 
+  private static final int CHUNK_SIZE = 100;
+
   private final JobBuilderFactory jobBuilderFactory;
   private final StepBuilderFactory stepBuilderFactory;
   private final CoinGeckoApiService coinGeckoApiService;
@@ -44,7 +46,7 @@ public class CoinBatchConfiguration {
   @JobScope
   public Step fetchUpbitCoinStep() {
     return stepBuilderFactory.get("fetchUpbitCoinStep")
-        .<List<CoinDto>, List<CoinDto>>chunk(10)
+        .<List<CoinDto>, List<CoinDto>>chunk(CHUNK_SIZE)
         .reader(upbitCoinGeckoApiReader())
         .writer(coinGeckoApiWriter())
         .build();
@@ -54,7 +56,7 @@ public class CoinBatchConfiguration {
   @JobScope
   public Step fetchBithumbCoinStep() {
     return stepBuilderFactory.get("fetchBithumbCoinStep")
-        .<List<CoinDto>, List<CoinDto>>chunk(10)
+        .<List<CoinDto>, List<CoinDto>>chunk(CHUNK_SIZE)
         .reader(bithumbCoinGeckoApiReader())
         .writer(coinGeckoApiWriter())
         .build();
