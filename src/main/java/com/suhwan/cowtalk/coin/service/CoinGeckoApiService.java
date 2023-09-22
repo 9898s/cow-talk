@@ -13,9 +13,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -58,6 +60,12 @@ public class CoinGeckoApiService {
             .build()
         )
         .retrieve()
+        .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
+          return Mono.error(new IllegalStateException("클라이언트 에러가 발생했습니다."));
+        })
+        .onStatus(HttpStatus::is5xxServerError, clientResponse -> {
+          return Mono.error(new IllegalStateException("CoinGecko API 서버에서 에러가 발생했습니다."));
+        })
         .bodyToMono(CoinGeckoApiResponse.class)
         .flux()
         .toStream()
