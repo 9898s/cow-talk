@@ -1,5 +1,7 @@
 package com.suhwan.cowtalk.member.service;
 
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.suhwan.cowtalk.common.component.MailComponent;
 import com.suhwan.cowtalk.common.security.jwt.TokenProvider;
 import com.suhwan.cowtalk.common.security.jwt.TokenRequest;
@@ -13,13 +15,16 @@ import com.suhwan.cowtalk.member.model.SignUpMemberRequest;
 import com.suhwan.cowtalk.member.model.UpdateMemberRequest;
 import com.suhwan.cowtalk.member.repository.MemberRepository;
 import com.suhwan.cowtalk.member.type.Roles;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,6 +37,10 @@ public class MemberService {
   private final BCryptPasswordEncoder bCryptPasswordEncoder;
   private final TokenProvider tokenProvider;
   private final MailComponent mailComponent;
+  private final AmazonS3Client amazonS3Client;
+
+  @Value("${cloud.aws.s3.bucket}")
+  private String bucket;
 
   // 회원가입
   public MemberDto signUp(SignUpMemberRequest request) {
@@ -119,6 +128,39 @@ public class MemberService {
     }
 
     member.update(request.getNickname());
+
+    return MemberDto.fromEntity(member);
+  }
+
+  // 회원 이미지 업로드
+  @Transactional
+  public MemberDto uploadMember(Long id, MultipartFile file) {
+    Member member = memberRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 회원 번호입니다."));
+
+    ObjectMetadata metadata = new ObjectMetadata();
+    metadata.setContentType(file.getContentType());
+    metadata.setContentLength(file.getSize());
+
+    String fileName = file.getOriginalFilename();
+
+    int extensionIndex = fileName.lastIndexOf(".");
+    String extension = fileName.substring(extensionIndex + 1);
+
+    String fileUrl = member.getUuid() + "." + extension;
+    String key = "profile/" + fileUrl;
+
+    try {
+      // 존재할 경우 삭제
+      if (amazonS3Client.doesObjectExist(bucket, key)) {
+        amazonS3Client.deleteObject(bucket, key);
+      }
+
+      amazonS3Client.putObject(bucket, key, file.getInputStream(), metadata);
+      member.upload(key);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
 
     return MemberDto.fromEntity(member);
   }

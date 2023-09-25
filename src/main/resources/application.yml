@@ -32,4 +32,4 @@ spring:
     secret: qwertyuiopasdfghjklzxcvbnm
 
   profiles:
-    include: oauth, mail
+    include: oauth, mail, aws

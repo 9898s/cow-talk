@@ -10,6 +10,7 @@ import com.suhwan.cowtalk.member.model.MemberDto;
 import com.suhwan.cowtalk.member.model.SignInMemberRequest;
 import com.suhwan.cowtalk.member.model.SignUpMemberRequest;
 import com.suhwan.cowtalk.member.model.SignUpMemberResponse;
+import com.suhwan.cowtalk.member.model.UploadMemberResponse;
 import com.suhwan.cowtalk.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
@@ -66,5 +68,12 @@ public class MemberApiController {
     MemberDto memberDto = memberService.updateMember(id, request);
 
     return ResponseEntity.ok().body(UpdateMemberResponse.from(memberDto));
+  }
+
+  @PostMapping("/upload/{id}")
+  public ResponseEntity<?> uploadMember(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+    MemberDto memberDto = memberService.uploadMember(id, file);
+
+    return ResponseEntity.ok().body(UploadMemberResponse.from(memberDto));
   }
 }

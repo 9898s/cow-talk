@@ -77,4 +77,10 @@ public class Member {
 
     return this;
   }
+
+  public Member upload(String fileUrl) {
+    this.pictureUrl = fileUrl;
+
+    return this;
+  }
 }
