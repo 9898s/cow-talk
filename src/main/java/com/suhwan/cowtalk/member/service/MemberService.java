@@ -172,4 +172,19 @@ public class MemberService {
 
     return MemberDto.fromEntity(member);
   }
+
+  // 회원 삭제
+  @Transactional
+  public MemberDto deleteMember(Long id) {
+    Member member = memberRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 회원 번호입니다."));
+
+    if (member.getDeleteDateTime() != null) {
+      throw new IllegalStateException("이미 삭제된 회원 번호입니다.");
+    }
+
+    member.delete();
+
+    return MemberDto.fromEntity(member);
+  }
 }

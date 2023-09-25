@@ -4,17 +4,19 @@ import com.suhwan.cowtalk.common.security.jwt.TokenProvider;
 import com.suhwan.cowtalk.common.security.jwt.TokenRequest;
 import com.suhwan.cowtalk.common.security.jwt.TokenResponse;
 import com.suhwan.cowtalk.member.model.AuthMemberResponse;
-import com.suhwan.cowtalk.member.model.MemberResponse;
-import com.suhwan.cowtalk.member.model.UpdateMemberResponse;
-import com.suhwan.cowtalk.member.model.UpdateMemberRequest;
+import com.suhwan.cowtalk.member.model.DeleteMemberResponse;
 import com.suhwan.cowtalk.member.model.MemberDto;
+import com.suhwan.cowtalk.member.model.MemberResponse;
 import com.suhwan.cowtalk.member.model.SignInMemberRequest;
 import com.suhwan.cowtalk.member.model.SignUpMemberRequest;
 import com.suhwan.cowtalk.member.model.SignUpMemberResponse;
+import com.suhwan.cowtalk.member.model.UpdateMemberRequest;
+import com.suhwan.cowtalk.member.model.UpdateMemberResponse;
 import com.suhwan.cowtalk.member.model.UploadMemberResponse;
 import com.suhwan.cowtalk.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,14 +67,16 @@ public class MemberApiController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<?> updateMember(@PathVariable Long id, @RequestBody UpdateMemberRequest request) {
+  public ResponseEntity<?> updateMember(@PathVariable Long id,
+      @RequestBody UpdateMemberRequest request) {
     MemberDto memberDto = memberService.updateMember(id, request);
 
     return ResponseEntity.ok().body(UpdateMemberResponse.from(memberDto));
   }
 
   @PostMapping("/upload/{id}")
-  public ResponseEntity<?> uploadMember(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+  public ResponseEntity<?> uploadMember(@PathVariable Long id,
+      @RequestParam("file") MultipartFile file) {
     MemberDto memberDto = memberService.uploadMember(id, file);
 
     return ResponseEntity.ok().body(UploadMemberResponse.from(memberDto));
@@ -83,5 +87,12 @@ public class MemberApiController {
     MemberDto memberDto = memberService.getMember(id);
 
     return ResponseEntity.ok().body(MemberResponse.from(memberDto));
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteMember(@PathVariable Long id) {
+    MemberDto memberDto = memberService.deleteMember(id);
+
+    return ResponseEntity.ok().body(DeleteMemberResponse.from(memberDto));
   }
 }
