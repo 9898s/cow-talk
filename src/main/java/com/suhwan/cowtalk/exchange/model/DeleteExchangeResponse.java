@@ -18,14 +18,14 @@ public class DeleteExchangeResponse {
   private String englishName;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime deleteDate;
+  private LocalDateTime deleteDateTime;
 
   public static DeleteExchangeResponse from(ExchangeDto exchangeDto) {
     return DeleteExchangeResponse.builder()
         .id(exchangeDto.getId())
         .koreanName(exchangeDto.getKoreanName())
         .englishName(exchangeDto.getEnglishName())
-        .deleteDate(exchangeDto.getDeleteDate())
+        .deleteDateTime(exchangeDto.getDeleteDateTime())
         .build();
   }
 }

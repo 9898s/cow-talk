@@ -49,7 +49,7 @@ public class CoinService {
     Coin coin = coinRepository.findById(id)
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 코인 번호입니다."));
 
-    if (coin.getDeleteDate() != null) {
+    if (coin.getDeleteDateTime() != null) {
       throw new IllegalStateException("이미 삭제된 코인 번호입니다.");
     }
 

@@ -101,7 +101,6 @@ public class CoinGeckoApiService {
             .initial(coinDto.getInitial())
             .name(coinDto.getName())
             .exchange(coinDto.getExchange())
-            .createDate(LocalDateTime.now())
             .build()
     );
   }

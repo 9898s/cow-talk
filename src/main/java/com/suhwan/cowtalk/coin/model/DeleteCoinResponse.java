@@ -19,7 +19,7 @@ public class DeleteCoinResponse {
   private String exchangeName;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime deleteDate;
+  private LocalDateTime deleteDateTime;
 
   public static DeleteCoinResponse from(CoinDto coinDto) {
     return DeleteCoinResponse.builder()
@@ -27,7 +27,7 @@ public class DeleteCoinResponse {
         .initial(coinDto.getInitial())
         .name(coinDto.getName())
         .exchangeName(coinDto.getExchange().getEnglishName())
-        .deleteDate(coinDto.getDeleteDate())
+        .deleteDateTime(coinDto.getDeleteDateTime())
         .build();
   }
 }

@@ -19,13 +19,13 @@ public class CoinResponse {
   private String exchangeName;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime createDate;
+  private LocalDateTime createDateTime;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime updateDate;
+  private LocalDateTime updateDateTime;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime deleteDate;
+  private LocalDateTime deleteDateTime;
 
   public static CoinResponse from(CoinDto coinDto) {
     return CoinResponse.builder()
@@ -33,9 +33,9 @@ public class CoinResponse {
         .initial(coinDto.getInitial())
         .name(coinDto.getName())
         .exchangeName(coinDto.getExchange().getEnglishName())
-        .createDate(coinDto.getCreateDate())
-        .updateDate(coinDto.getUpdateDate())
-        .deleteDate(coinDto.getDeleteDate())
+        .createDateTime(coinDto.getCreateDateTime())
+        .updateDateTime(coinDto.getUpdateDateTime())
+        .deleteDateTime(coinDto.getDeleteDateTime())
         .build();
   }
 }

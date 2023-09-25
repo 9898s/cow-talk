@@ -16,18 +16,18 @@ public class ExchangeDto {
   private Long id;
   private String koreanName;
   private String englishName;
-  private LocalDateTime createDate;
-  private LocalDateTime updateDate;
-  private LocalDateTime deleteDate;
+  private LocalDateTime createDateTime;
+  private LocalDateTime updateDateTime;
+  private LocalDateTime deleteDateTime;
 
   public static ExchangeDto fromEntity(Exchange exchange) {
     return ExchangeDto.builder()
         .id(exchange.getId())
         .koreanName(exchange.getKoreanName())
         .englishName(exchange.getEnglishName())
-        .createDate(exchange.getCreateDate())
-        .updateDate(exchange.getUpdateDate())
-        .deleteDate(exchange.getDeleteDate())
+        .createDateTime(exchange.getCreateDateTime())
+        .updateDateTime(exchange.getUpdateDateTime())
+        .deleteDateTime(exchange.getDeleteDateTime())
         .build();
   }
 }
