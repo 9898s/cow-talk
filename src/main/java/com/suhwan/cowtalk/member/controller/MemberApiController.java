@@ -4,6 +4,7 @@ import com.suhwan.cowtalk.common.security.jwt.TokenProvider;
 import com.suhwan.cowtalk.common.security.jwt.TokenRequest;
 import com.suhwan.cowtalk.common.security.jwt.TokenResponse;
 import com.suhwan.cowtalk.member.model.AuthMemberResponse;
+import com.suhwan.cowtalk.member.model.MemberResponse;
 import com.suhwan.cowtalk.member.model.UpdateMemberResponse;
 import com.suhwan.cowtalk.member.model.UpdateMemberRequest;
 import com.suhwan.cowtalk.member.model.MemberDto;
@@ -75,5 +76,12 @@ public class MemberApiController {
     MemberDto memberDto = memberService.uploadMember(id, file);
 
     return ResponseEntity.ok().body(UploadMemberResponse.from(memberDto));
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<?> getMember(@PathVariable Long id) {
+    MemberDto memberDto = memberService.getMember(id);
+
+    return ResponseEntity.ok().body(MemberResponse.from(memberDto));
   }
 }

@@ -164,4 +164,12 @@ public class MemberService {
 
     return MemberDto.fromEntity(member);
   }
+
+  @Transactional(readOnly = true)
+  public MemberDto getMember(Long id) {
+    Member member = memberRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 회원 번호입니다."));
+
+    return MemberDto.fromEntity(member);
+  }
 }
