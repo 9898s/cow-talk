@@ -59,9 +59,9 @@ public class Member {
   @Column
   private LocalDateTime deleteDateTime;
 
-  public Member update(String nickname, String pictureUrl) {
+  public Member update(String nickname) {
     this.nickname = nickname;
-    this.pictureUrl = pictureUrl;
+    this.updateDateTime = LocalDateTime.now();
 
     return this;
   }

@@ -4,6 +4,8 @@ import com.suhwan.cowtalk.common.security.jwt.TokenProvider;
 import com.suhwan.cowtalk.common.security.jwt.TokenRequest;
 import com.suhwan.cowtalk.common.security.jwt.TokenResponse;
 import com.suhwan.cowtalk.member.model.AuthMemberResponse;
+import com.suhwan.cowtalk.member.model.UpdateMemberResponse;
+import com.suhwan.cowtalk.member.model.UpdateMemberRequest;
 import com.suhwan.cowtalk.member.model.MemberDto;
 import com.suhwan.cowtalk.member.model.SignInMemberRequest;
 import com.suhwan.cowtalk.member.model.SignUpMemberRequest;
@@ -12,7 +14,9 @@ import com.suhwan.cowtalk.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,5 +59,12 @@ public class MemberApiController {
     TokenResponse response = memberService.refresh(request);
 
     return ResponseEntity.ok().body(response);
+  }
+
+  @PutMapping("/{id}")
+  public ResponseEntity<?> updateMember(@PathVariable Long id, @RequestBody UpdateMemberRequest request) {
+    MemberDto memberDto = memberService.updateMember(id, request);
+
+    return ResponseEntity.ok().body(UpdateMemberResponse.from(memberDto));
   }
 }

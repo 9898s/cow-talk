@@ -10,6 +10,7 @@ import com.suhwan.cowtalk.member.entity.Member;
 import com.suhwan.cowtalk.member.model.MemberDto;
 import com.suhwan.cowtalk.member.model.SignInMemberRequest;
 import com.suhwan.cowtalk.member.model.SignUpMemberRequest;
+import com.suhwan.cowtalk.member.model.UpdateMemberRequest;
 import com.suhwan.cowtalk.member.repository.MemberRepository;
 import com.suhwan.cowtalk.member.type.Roles;
 import java.time.LocalDateTime;
@@ -104,5 +105,21 @@ public class MemberService {
         member.getRoles());
 
     return TokenResponse.of(accessToken, refreshToken.getRefreshToken());
+  }
+
+  // 회원 정보 수정
+  @Transactional
+  public MemberDto updateMember(Long id, UpdateMemberRequest request) {
+    Member member = memberRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 회원 번호입니다."));
+
+    LocalDateTime updateDateTime = member.getUpdateDateTime();
+    if (updateDateTime != null && updateDateTime.isBefore(updateDateTime.plusMonths(1L))) {
+      throw new IllegalStateException("닉네임을 아직 변경할 수 없습니다.");
+    }
+
+    member.update(request.getNickname());
+
+    return MemberDto.fromEntity(member);
   }
 }
