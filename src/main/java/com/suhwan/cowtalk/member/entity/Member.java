@@ -1,5 +1,6 @@
 package com.suhwan.cowtalk.member.entity;
 
+import com.suhwan.cowtalk.common.entity.BaseTimeEntity;
 import com.suhwan.cowtalk.member.type.Roles;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 @Entity
-public class Member {
+public class Member extends BaseTimeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,9 +50,6 @@ public class Member {
   @Enumerated(EnumType.STRING)
   @Column
   private Roles roles;
-
-  @Column
-  private LocalDateTime createDateTime;
 
   @Column
   private LocalDateTime updateDateTime;

@@ -62,7 +62,6 @@ public class MemberService {
         .uuid(uuid)
         .emailAuthYn(false)
         .roles(Roles.ROLE_USER)
-        .createDateTime(LocalDateTime.now())
         .build();
 
     String email = request.getEmail();

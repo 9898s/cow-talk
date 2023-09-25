@@ -18,9 +18,9 @@ public class CoinDto {
   private String initial;
   private String name;
   private Exchange exchange;
-  private LocalDateTime createDate;
-  private LocalDateTime updateDate;
-  private LocalDateTime deleteDate;
+  private LocalDateTime createDateTime;
+  private LocalDateTime updateDateTime;
+  private LocalDateTime deleteDateTime;
 
   public static CoinDto fromEntity(Coin coin) {
     return CoinDto.builder()
@@ -28,9 +28,9 @@ public class CoinDto {
         .initial(coin.getInitial())
         .name(coin.getName())
         .exchange(coin.getExchange())
-        .createDate(coin.getCreateDate())
-        .updateDate(coin.getUpdateDate())
-        .deleteDate(coin.getDeleteDate())
+        .createDateTime(coin.getCreateDateTime())
+        .updateDateTime(coin.getUpdateDateTime())
+        .deleteDateTime(coin.getDeleteDateTime())
         .build();
   }
 }

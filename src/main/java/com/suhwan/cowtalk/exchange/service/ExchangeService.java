@@ -28,7 +28,6 @@ public class ExchangeService {
         exchangeRepository.save(Exchange.builder()
             .koreanName(request.getKoreanName())
             .englishName(request.getEnglishName())
-            .createDate(LocalDateTime.now())
             .build())
     );
   }

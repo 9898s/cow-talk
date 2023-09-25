@@ -1,5 +1,6 @@
 package com.suhwan.cowtalk.exchange.entity;
 
+import com.suhwan.cowtalk.common.entity.BaseTimeEntity;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 @Entity
-public class Exchange {
+public class Exchange extends BaseTimeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,21 +30,18 @@ public class Exchange {
   private String englishName;
 
   @Column
-  private LocalDateTime createDate;
+  private LocalDateTime updateDateTime;
 
   @Column
-  private LocalDateTime updateDate;
+  private LocalDateTime deleteDateTime;
 
-  @Column
-  private LocalDateTime deleteDate;
-
-  public void update(String koreanName, String englishName, LocalDateTime updateDate) {
+  public void update(String koreanName, String englishName, LocalDateTime updateDateTime) {
     this.koreanName = koreanName;
     this.englishName = englishName;
-    this.updateDate = updateDate;
+    this.updateDateTime = updateDateTime;
   }
 
-  public void delete(LocalDateTime deleteDate) {
-    this.deleteDate = deleteDate;
+  public void delete(LocalDateTime deleteDateTime) {
+    this.deleteDateTime = deleteDateTime;
   }
 }

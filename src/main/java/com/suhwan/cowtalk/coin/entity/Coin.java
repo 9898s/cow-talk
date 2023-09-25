@@ -1,5 +1,6 @@
 package com.suhwan.cowtalk.coin.entity;
 
+import com.suhwan.cowtalk.common.entity.BaseTimeEntity;
 import com.suhwan.cowtalk.exchange.entity.Exchange;
 import java.time.LocalDateTime;
 import javax.persistence.Column;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 @Entity
-public class Coin {
+public class Coin extends BaseTimeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,19 +37,16 @@ public class Coin {
   private Exchange exchange;
 
   @Column
-  private LocalDateTime createDate;
+  private LocalDateTime updateDateTime;
 
   @Column
-  private LocalDateTime updateDate;
-
-  @Column
-  private LocalDateTime deleteDate;
+  private LocalDateTime deleteDateTime;
 
   public void update() {
-    this.updateDate = LocalDateTime.now();
+    this.updateDateTime = LocalDateTime.now();
   }
 
   public void delete() {
-    this.deleteDate = LocalDateTime.now();
+    this.deleteDateTime = LocalDateTime.now();
   }
 }

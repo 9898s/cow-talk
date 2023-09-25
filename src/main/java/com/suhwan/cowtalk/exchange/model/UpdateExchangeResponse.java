@@ -18,14 +18,14 @@ public class UpdateExchangeResponse {
   private String englishName;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime updateDate;
+  private LocalDateTime updateDateTime;
 
   public static UpdateExchangeResponse from(ExchangeDto exchange) {
     return UpdateExchangeResponse.builder()
         .id(exchange.getId())
         .koreanName(exchange.getKoreanName())
         .englishName(exchange.getEnglishName())
-        .updateDate(exchange.getUpdateDate())
+        .updateDateTime(exchange.getUpdateDateTime())
         .build();
   }
 }

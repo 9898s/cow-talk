@@ -18,22 +18,22 @@ public class ExchangeResponse {
   private String englishName;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime createDate;
+  private LocalDateTime createDateTime;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime updateDate;
+  private LocalDateTime updateDateTime;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-  private LocalDateTime deleteDate;
+  private LocalDateTime deleteDateTime;
 
   public static ExchangeResponse from(ExchangeDto exchangeDto) {
     return ExchangeResponse.builder()
         .id(exchangeDto.getId())
         .koreanName(exchangeDto.getKoreanName())
         .englishName(exchangeDto.getEnglishName())
-        .createDate(exchangeDto.getCreateDate())
-        .updateDate(exchangeDto.getUpdateDate())
-        .deleteDate(exchangeDto.getDeleteDate())
+        .createDateTime(exchangeDto.getCreateDateTime())
+        .updateDateTime(exchangeDto.getUpdateDateTime())
+        .deleteDateTime(exchangeDto.getDeleteDateTime())
         .build();
   }
 }
