@@ -4,9 +4,11 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+
   h2:
     console:
       enabled: true
+
   jpa:
     defer-datasource-initialization: true
     database-platform: H2
@@ -16,6 +18,18 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+
   batch:
     job:
       enabled: false
+
+  redis:
+    host: localhost
+    port: 6379
+
+
+  jwt:
+    secret: qwertyuiopasdfghjklzxcvbnm
+
+  profiles:
+    include: oauth, mail
