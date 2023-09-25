@@ -15,7 +15,6 @@ public class MemberResponse {
 
   private Long id;
   private String email;
-  private String password;
   private String nickname;
   private long experience;
   private String pictureUrl;
@@ -34,7 +33,6 @@ public class MemberResponse {
     return MemberResponse.builder()
         .id(memberDto.getId())
         .email(memberDto.getEmail())
-        .password(memberDto.getPassword())
         .nickname(memberDto.getNickname())
         .experience(memberDto.getExperience())
         .pictureUrl(memberDto.getPictureUrl())
