@@ -1,0 +1,59 @@
+package com.suhwan.cowtalk.member.controller;
+
+import com.suhwan.cowtalk.common.security.jwt.TokenProvider;
+import com.suhwan.cowtalk.common.security.jwt.TokenRequest;
+import com.suhwan.cowtalk.common.security.jwt.TokenResponse;
+import com.suhwan.cowtalk.member.model.AuthMemberResponse;
+import com.suhwan.cowtalk.member.model.MemberDto;
+import com.suhwan.cowtalk.member.model.SignInMemberRequest;
+import com.suhwan.cowtalk.member.model.SignUpMemberRequest;
+import com.suhwan.cowtalk.member.model.SignUpMemberResponse;
+import com.suhwan.cowtalk.member.service.MemberService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RequestMapping("/api/member")
+@RestController
+public class MemberApiController {
+
+  private final MemberService memberService;
+  private final TokenProvider tokenProvider;
+
+  @PostMapping("/signup")
+  public ResponseEntity<?> signup(@RequestBody SignUpMemberRequest request) {
+    MemberDto memberDto = memberService.signUp(request);
+
+    return ResponseEntity.ok().body(SignUpMemberResponse.from(memberDto));
+  }
+
+  @PostMapping("/signin")
+  public ResponseEntity<?> signin(@RequestBody SignInMemberRequest request) {
+    MemberDto memberDto = memberService.signIn(request);
+
+    String token = tokenProvider.createToken(memberDto.getEmail(), memberDto.getRoles());
+    String refreshToken = tokenProvider.createRefreshToken(memberDto.getEmail());
+
+    return ResponseEntity.ok().body(TokenResponse.of(token, refreshToken));
+  }
+
+  @GetMapping("/email-auth")
+  public ResponseEntity<?> emailAuth(@RequestParam String uuid) {
+    MemberDto memberDto = memberService.emailAuth(uuid);
+
+    return ResponseEntity.ok().body(AuthMemberResponse.from(memberDto));
+  }
+
+  @GetMapping("/refresh")
+  public ResponseEntity<?> refresh(@RequestBody TokenRequest request) {
+    TokenResponse response = memberService.refresh(request);
+
+    return ResponseEntity.ok().body(response);
+  }
+}
