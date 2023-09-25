@@ -31,6 +31,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class MemberService {
 
+  private static final Long MEMBER_UPDATE_PERIOD_MONTH = 1L;
+
   private final MemberRepository memberRepository;
   private final RefreshTokenRepository refreshTokenRepository;
 
@@ -123,7 +125,8 @@ public class MemberService {
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 회원 번호입니다."));
 
     LocalDateTime updateDateTime = member.getUpdateDateTime();
-    if (updateDateTime != null && updateDateTime.isBefore(updateDateTime.plusMonths(1L))) {
+    if (updateDateTime != null && updateDateTime.isBefore(
+        updateDateTime.plusMonths(MEMBER_UPDATE_PERIOD_MONTH))) {
       throw new IllegalStateException("닉네임을 아직 변경할 수 없습니다.");
     }
 
@@ -144,8 +147,7 @@ public class MemberService {
 
     String fileName = file.getOriginalFilename();
 
-    int extensionIndex = fileName.lastIndexOf(".");
-    String extension = fileName.substring(extensionIndex + 1);
+    String extension = getExtension(fileName);
 
     String fileUrl = member.getUuid() + "." + extension;
     String key = "profile/" + fileUrl;
@@ -163,6 +165,12 @@ public class MemberService {
     }
 
     return MemberDto.fromEntity(member);
+  }
+
+  // 확장자명 구하기
+  private static String getExtension(String fileName) {
+    int extensionIndex = fileName.lastIndexOf(".");
+    return fileName.substring(extensionIndex + 1);
   }
 
   @Transactional(readOnly = true)

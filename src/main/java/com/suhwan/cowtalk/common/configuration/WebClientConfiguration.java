@@ -1,4 +1,4 @@
-package com.suhwan.cowtalk.coin.config;
+package com.suhwan.cowtalk.common.configuration;
 
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
