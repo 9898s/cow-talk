@@ -45,4 +45,19 @@ public class CategoryService {
 
     return CategoryDto.fromEntity(category);
   }
+
+  // 카테고리 삭제
+  @Transactional
+  public CategoryDto deleteCategory(Long id) {
+    Category category = categoryRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 카테고리 번호입니다."));
+
+    if (category.getDeleteDateTime() != null) {
+      throw new IllegalStateException("이미 삭제된 카테고리 번호입니다.");
+    }
+
+    category.delete();
+
+    return CategoryDto.fromEntity(category);
+  }
 }

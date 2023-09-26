@@ -42,4 +42,10 @@ public class Category extends BaseTimeEntity {
 
     return this;
   }
+
+  public Category delete() {
+    this.deleteDateTime = LocalDateTime.now();
+
+    return this;
+  }
 }
