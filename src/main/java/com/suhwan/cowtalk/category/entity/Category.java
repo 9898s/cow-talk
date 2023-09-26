@@ -34,4 +34,12 @@ public class Category extends BaseTimeEntity {
 
   @Column
   private LocalDateTime deleteDateTime;
+
+  public Category update(String name, Boolean isReadOnly) {
+    this.name = name;
+    this.isReadOnly = isReadOnly;
+    this.updateDateTime = LocalDateTime.now();
+
+    return this;
+  }
 }
