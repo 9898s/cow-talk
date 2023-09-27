@@ -61,6 +61,10 @@ public class PostService {
       throw new IllegalStateException("작성한 게시글이 아닙니다.");
     }
 
+    if (Boolean.TRUE.equals(post.getIsBlindYn()) || post.getDeleteDateTime() != null) {
+      throw new IllegalStateException("수정할 수 없는 게시글입니다.");
+    }
+
     post.update(request.getTitle(), request.getContent());
 
     return PostDto.fromEntity(post);
