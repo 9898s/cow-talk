@@ -7,10 +7,12 @@ import com.suhwan.cowtalk.member.entity.Member;
 import com.suhwan.cowtalk.member.repository.MemberRepository;
 import com.suhwan.cowtalk.post.entity.Post;
 import com.suhwan.cowtalk.post.model.PostDto;
+import com.suhwan.cowtalk.post.model.UpdatePostRequest;
 import com.suhwan.cowtalk.post.model.WritePostRequest;
 import com.suhwan.cowtalk.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -43,5 +45,24 @@ public class PostService {
                 .build()
         )
     );
+  }
+
+  // 게시글 업데이트
+  @Transactional
+  public PostDto updatePost(Long id, UpdatePostRequest request) {
+    Post post = postRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+
+    String email = SecurityUtil.getLoginMemberEmail();
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+
+    if (post.getMember() != member) {
+      throw new IllegalStateException("작성한 게시글이 아닙니다.");
+    }
+
+    post.update(request.getTitle(), request.getContent());
+
+    return PostDto.fromEntity(post);
   }
 }
