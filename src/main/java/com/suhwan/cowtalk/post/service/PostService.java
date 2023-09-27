@@ -65,4 +65,26 @@ public class PostService {
 
     return PostDto.fromEntity(post);
   }
+
+  // 게시글 삭제
+  @Transactional
+  public PostDto deletePost(Long id) {
+    Post post = postRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+
+    if (post.getDeleteDateTime() != null) {
+      throw new IllegalStateException("이미 삭제된 게시글입니다.");
+    }
+
+    String email = SecurityUtil.getLoginMemberEmail();
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+
+    if (post.getMember() != member) {
+      throw new IllegalStateException("작성한 게시글이 아닙니다.");
+    }
+
+    post.delete();
+    return PostDto.fromEntity(post);
+  }
 }
