@@ -1,11 +1,15 @@
 package com.suhwan.cowtalk.post.controller;
 
+import com.suhwan.cowtalk.common.type.GoodBad;
 import com.suhwan.cowtalk.post.model.DeletePostResponse;
 import com.suhwan.cowtalk.post.model.PostDto;
 import com.suhwan.cowtalk.post.model.UpdatePostRequest;
 import com.suhwan.cowtalk.post.model.UpdatePostResponse;
 import com.suhwan.cowtalk.post.model.WritePostRequest;
 import com.suhwan.cowtalk.post.model.WritePostResponse;
+import com.suhwan.cowtalk.post.model.goodbad.GoodBadPostResponse;
+import com.suhwan.cowtalk.post.model.goodbad.PostGoodBadDto;
+import com.suhwan.cowtalk.post.service.PostGoodBadService;
 import com.suhwan.cowtalk.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostController {
 
   private final PostService postService;
+  private final PostGoodBadService postGoodBadService;
 
   @PostMapping
   public ResponseEntity<?> writePost(@RequestBody WritePostRequest request) {
@@ -32,7 +37,8 @@ public class PostController {
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody UpdatePostRequest request) {
+  public ResponseEntity<?> updatePost(@PathVariable Long id,
+      @RequestBody UpdatePostRequest request) {
     PostDto postDto = postService.updatePost(id, request);
 
     return ResponseEntity.ok().body(UpdatePostResponse.from(postDto));
@@ -43,5 +49,19 @@ public class PostController {
     PostDto postDto = postService.deletePost(id);
 
     return ResponseEntity.ok().body(DeletePostResponse.from(postDto));
+  }
+
+  @PostMapping("/{id}/good")
+  public ResponseEntity<?> goodPost(@PathVariable Long id) {
+    PostGoodBadDto postGoodBadDto = postGoodBadService.goodBadPost(id, GoodBad.GOOD);
+
+    return ResponseEntity.ok().body(GoodBadPostResponse.from(postGoodBadDto));
+  }
+
+  @PostMapping("/{id}/bad")
+  public ResponseEntity<?> badPost(@PathVariable Long id) {
+    PostGoodBadDto postGoodBadDto = postGoodBadService.goodBadPost(id, GoodBad.BAD);
+
+    return ResponseEntity.ok().body(GoodBadPostResponse.from(postGoodBadDto));
   }
 }
