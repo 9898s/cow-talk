@@ -6,12 +6,15 @@ import com.suhwan.cowtalk.common.security.SecurityUtil;
 import com.suhwan.cowtalk.member.entity.Member;
 import com.suhwan.cowtalk.member.repository.MemberRepository;
 import com.suhwan.cowtalk.post.entity.Post;
+import com.suhwan.cowtalk.post.entity.PostView;
 import com.suhwan.cowtalk.post.model.PostDto;
 import com.suhwan.cowtalk.post.model.UpdatePostRequest;
 import com.suhwan.cowtalk.post.model.WritePostRequest;
 import com.suhwan.cowtalk.post.repository.PostRepository;
+import com.suhwan.cowtalk.post.repository.PostViewRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +30,7 @@ public class PostService {
   private final PostRepository postRepository;
   private final MemberRepository memberRepository;
   private final CategoryRepository categoryRepository;
+  private final PostViewRepository postViewRepository;
 
   // 게시글 작성
   public PostDto writePost(WritePostRequest request) {
@@ -54,11 +58,26 @@ public class PostService {
   }
 
   // 게시글 조회
-  @Transactional(readOnly = true)
-  public PostDto getPost(Long id) {
+  @Transactional
+  public PostDto getPost(Long id, HttpServletRequest request) {
     Post post = postRepository.findById(id)
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
 
+    // 게시글 번호와 아이피가 redis 서버에 존재하지 않을 경우 조회수 증가
+    String ip = request.getRemoteAddr();
+    String postViewId = id + ":" + ip;
+    if (!postViewRepository.existsById(postViewId)) {
+
+      postViewRepository.save(
+          PostView.builder()
+              .id(postViewId)
+              .postId(id)
+              .ip(ip)
+              .build()
+      );
+
+      post.addView();
+    }
     return PostDto.fromEntity(post);
   }
 

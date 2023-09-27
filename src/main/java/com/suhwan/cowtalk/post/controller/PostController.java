@@ -15,6 +15,7 @@ import com.suhwan.cowtalk.post.service.PostGoodBadService;
 import com.suhwan.cowtalk.post.service.PostService;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -43,8 +44,8 @@ public class PostController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<?> getPost(@PathVariable Long id) {
-    PostDto postDto = postService.getPost(id);
+  public ResponseEntity<?> getPost(@PathVariable Long id, HttpServletRequest request) {
+    PostDto postDto = postService.getPost(id, request);
 
     Long goodCount = postGoodBadService.countGoodBad(id, GoodBad.GOOD);
     Long badCount = postGoodBadService.countGoodBad(id, GoodBad.BAD);

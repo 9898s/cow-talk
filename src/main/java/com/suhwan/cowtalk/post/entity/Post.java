@@ -66,4 +66,10 @@ public class Post extends BaseTimeEntity {
 
     return this;
   }
+
+  public Post addView() {
+    this.view += 1;
+
+    return this;
+  }
 }
