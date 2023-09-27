@@ -10,5 +10,5 @@ public interface PostGoodBadRepository extends JpaRepository<PostGoodBad, Long> 
 
   boolean existsByPostAndMember(Post post, Member member);
 
-  Long countByGoodBad(GoodBad goodBad);
+  long countByPostAndGoodBad(Post post, GoodBad goodBad);
 }

@@ -50,10 +50,9 @@ public class PostGoodBadService {
 
   // 게시글 좋아요/싫어요 개수 조회
   public Long countGoodBad(Long id, GoodBad goodBad) {
-    if (!postRepository.existsById(id)) {
-      throw new IllegalStateException("찾을 수 없는 게시글 번호입니다.");
-    }
+    Post post = postRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
 
-    return postGoodBadRepository.countByGoodBad(goodBad);
+    return postGoodBadRepository.countByPostAndGoodBad(post, goodBad);
   }
 }

@@ -10,7 +10,13 @@ import com.suhwan.cowtalk.post.model.PostDto;
 import com.suhwan.cowtalk.post.model.UpdatePostRequest;
 import com.suhwan.cowtalk.post.model.WritePostRequest;
 import com.suhwan.cowtalk.post.repository.PostRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,5 +105,17 @@ public class PostService {
 
     post.delete();
     return PostDto.fromEntity(post);
+  }
+
+  // 게시글 전체
+  @Transactional(readOnly = true)
+  public List<PostDto> getAllPost(int page, int size) {
+    Sort sort = Sort.by(Sort.Direction.DESC, "id");
+    Pageable pageable = PageRequest.of(page, size, sort);
+    Page<Post> posts = postRepository.findAll(pageable);
+
+    return posts.stream()
+        .map(PostDto::fromEntity)
+        .collect(Collectors.toList());
   }
 }

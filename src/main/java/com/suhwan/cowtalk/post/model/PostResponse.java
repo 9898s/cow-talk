@@ -1,8 +1,6 @@
 package com.suhwan.cowtalk.post.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.suhwan.cowtalk.category.entity.Category;
-import com.suhwan.cowtalk.member.entity.Member;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +32,7 @@ public class PostResponse {
   private Long goodCount;
   private Long badCount;
 
-  public static PostResponse of(PostDto postDto, Long goodCount, Long badCount) {
+  public static PostResponse from(PostDto postDto, Long goodCount, Long badCount) {
 
     return PostResponse.builder()
         .id(postDto.getId())
