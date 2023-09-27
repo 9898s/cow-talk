@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class PostGoodBadDto {
 
   private Long id;
-  private GoodBad goodOrBad;
+  private GoodBad goodBad;
   private Post post;
   private Member member;
   private LocalDateTime createDateTime;
@@ -26,7 +26,7 @@ public class PostGoodBadDto {
 
     return PostGoodBadDto.builder()
         .id(postGoodBad.getId())
-        .goodOrBad(postGoodBad.getGoodOrBad())
+        .goodBad(postGoodBad.getGoodBad())
         .post(postGoodBad.getPost())
         .member(postGoodBad.getMember())
         .createDateTime(postGoodBad.getCreateDateTime())

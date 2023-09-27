@@ -28,7 +28,7 @@ public class GoodBadPostResponse {
         .id(postGoodBadDto.getId())
         .postId(postGoodBadDto.getPost().getId())
         .memberId(postGoodBadDto.getMember().getId())
-        .goodBad(postGoodBadDto.getGoodOrBad())
+        .goodBad(postGoodBadDto.getGoodBad())
         .createDateTime(postGoodBadDto.getCreateDateTime())
         .build();
   }

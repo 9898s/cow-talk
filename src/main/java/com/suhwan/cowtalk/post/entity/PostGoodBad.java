@@ -31,7 +31,7 @@ public class PostGoodBad extends BaseTimeEntity {
 
   @Enumerated(EnumType.STRING)
   @Column
-  private GoodBad goodOrBad;
+  private GoodBad goodBad;
 
   @OneToOne
   @JoinColumn(name = "post_id")

@@ -47,6 +47,15 @@ public class PostService {
     );
   }
 
+  // 게시글 조회
+  @Transactional(readOnly = true)
+  public PostDto getPost(Long id) {
+    Post post = postRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+
+    return PostDto.fromEntity(post);
+  }
+
   // 게시글 업데이트
   @Transactional
   public PostDto updatePost(Long id, UpdatePostRequest request) {
