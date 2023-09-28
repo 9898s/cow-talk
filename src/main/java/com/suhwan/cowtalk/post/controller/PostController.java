@@ -77,6 +77,26 @@ public class PostController {
         PagePostResponse.of(postResponseList.size(), page, size, postResponseList));
   }
 
+  @GetMapping("/category/{categoryId}")
+  public ResponseEntity<?> getAllCategoryPost(
+      @PathVariable Long categoryId,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ) {
+    List<PostDto> postDtoList = postService.getAllCategoryPost(categoryId, page, size);
+    List<PostResponse> postResponseList = new ArrayList<>();
+
+    for (PostDto postDto : postDtoList) {
+      Long goodCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.GOOD);
+      Long badCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.BAD);
+
+      postResponseList.add(PostResponse.from(postDto, goodCount, badCount));
+    }
+
+    return ResponseEntity.ok().body(
+        PagePostResponse.of(postResponseList.size(), page, size, postResponseList));
+  }
+
   @PutMapping("/{id}")
   public ResponseEntity<?> updatePost(@PathVariable Long id,
       @RequestBody UpdatePostRequest request) {

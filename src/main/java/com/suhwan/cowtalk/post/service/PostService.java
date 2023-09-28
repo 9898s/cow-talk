@@ -140,6 +140,21 @@ public class PostService {
         .collect(Collectors.toList());
   }
 
+  // 게시글 전체(카테고리)
+  @Transactional(readOnly = true)
+  public List<PostDto> getAllCategoryPost(Long categoryId, int page, int size) {
+    Category category = categoryRepository.findById(categoryId)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 카테고리 번호입니다."));
+
+    Sort sort = Sort.by(Sort.Direction.DESC, "id");
+    Pageable pageable = PageRequest.of(page, size, sort);
+    Page<Post> posts = postRepository.findAllByCategory(category, pageable);
+
+    return posts.stream()
+        .map(PostDto::fromEntity)
+        .collect(Collectors.toList());
+  }
+
   // 인기 게시글
   @Transactional(readOnly = true)
   public List<PostDto> hotPost(
