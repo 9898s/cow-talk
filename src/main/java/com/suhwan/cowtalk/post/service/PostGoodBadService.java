@@ -11,16 +11,20 @@ import com.suhwan.cowtalk.post.repository.PostGoodBadRepository;
 import com.suhwan.cowtalk.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
 public class PostGoodBadService {
+
+  private static final int BLIND_COUNT = 5;
 
   private final PostGoodBadRepository postGoodBadRepository;
   private final PostRepository postRepository;
   private final MemberRepository memberRepository;
 
   // 게시글 좋아요/싫어요
+  @Transactional
   public PostGoodBadDto goodBadPost(Long id, GoodBad goodBad) {
     Post post = postRepository.findById(id)
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
@@ -35,6 +39,11 @@ public class PostGoodBadService {
 
     if (postGoodBadRepository.existsByPostAndMember(post, member)) {
       throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다.");
+    }
+
+    // 블라인드 처리
+    if (postGoodBadRepository.countByPostAndGoodBad(post, GoodBad.BAD) >= BLIND_COUNT) {
+      post.blind();
     }
 
     return PostGoodBadDto.fromEntity(
