@@ -12,6 +12,7 @@ import com.suhwan.cowtalk.post.model.UpdatePostRequest;
 import com.suhwan.cowtalk.post.model.WritePostRequest;
 import com.suhwan.cowtalk.post.repository.PostRepository;
 import com.suhwan.cowtalk.post.repository.PostViewRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -132,6 +134,20 @@ public class PostService {
     Sort sort = Sort.by(Sort.Direction.DESC, "id");
     Pageable pageable = PageRequest.of(page, size, sort);
     Page<Post> posts = postRepository.findAll(pageable);
+
+    return posts.stream()
+        .map(PostDto::fromEntity)
+        .collect(Collectors.toList());
+  }
+
+  // 인기 게시글
+  @Transactional(readOnly = true)
+  public List<PostDto> hotPost(
+      int page, int size, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+    Sort sort = Sort.by(Direction.DESC, "view");
+    Pageable pageable = PageRequest.of(page, size, sort);
+    Page<Post> posts = postRepository.findAllByCreateDateTimeBetween(pageable, startDateTime,
+        endDateTime);
 
     return posts.stream()
         .map(PostDto::fromEntity)

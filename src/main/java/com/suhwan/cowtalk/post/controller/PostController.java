@@ -13,6 +13,11 @@ import com.suhwan.cowtalk.post.model.goodbad.GoodBadPostResponse;
 import com.suhwan.cowtalk.post.model.goodbad.PostGoodBadDto;
 import com.suhwan.cowtalk.post.service.PostGoodBadService;
 import com.suhwan.cowtalk.post.service.PostService;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -99,5 +104,88 @@ public class PostController {
     PostGoodBadDto postGoodBadDto = postGoodBadService.goodBadPost(id, GoodBad.BAD);
 
     return ResponseEntity.ok().body(GoodBadPostResponse.from(postGoodBadDto));
+  }
+
+  @GetMapping("/hot/today")
+  public ResponseEntity<?> hotTodayPost(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ) {
+
+    LocalDateTime startDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT);
+    LocalDateTime endDateTime = startDateTime.plusDays(1).minusNanos(1);
+
+    List<PostDto> postDtoList = postService.hotPost(page, size, startDateTime, endDateTime);
+    List<PostResponse> postResponseList = new ArrayList<>();
+
+    for (PostDto postDto : postDtoList) {
+      Long goodCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.GOOD);
+      Long badCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.BAD);
+
+      postResponseList.add(PostResponse.from(postDto, goodCount, badCount));
+    }
+
+    return ResponseEntity.ok().body(
+        PagePostResponse.of(postResponseList.size(), page, size, postResponseList));
+  }
+
+  @GetMapping("/hot/week")
+  public ResponseEntity<?> hotWeekPost(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ) {
+
+    LocalDateTime now = LocalDateTime.now();
+
+    // 이번 주의 시작 날짜(월요일)
+    LocalDateTime startDateTime = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        .withHour(0).withMinute(0).withSecond(0);
+
+    // 이번 주의 끝 날짜(일요일)
+    LocalDateTime endDateTime = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+        .withHour(23).withMinute(59).withSecond(59);
+
+    List<PostDto> postDtoList = postService.hotPost(page, size, startDateTime, endDateTime);
+    List<PostResponse> postResponseList = new ArrayList<>();
+
+    for (PostDto postDto : postDtoList) {
+      Long goodCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.GOOD);
+      Long badCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.BAD);
+
+      postResponseList.add(PostResponse.from(postDto, goodCount, badCount));
+    }
+
+    return ResponseEntity.ok().body(
+        PagePostResponse.of(postResponseList.size(), page, size, postResponseList));
+  }
+
+  @GetMapping("/hot/month")
+  public ResponseEntity<?> hotMonthPost(
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "10") int size
+  ) {
+
+    LocalDateTime now = LocalDateTime.now();
+
+    // 이번 달의 시작 날짜와 시간(1일 00:00:00)
+    LocalDateTime startDateTime = LocalDateTime.of(now.toLocalDate().withDayOfMonth(1),
+        LocalTime.MIN);
+
+    // 이번 달의 마지막 날짜와 시간(마지막일 23:59:59)
+    LocalDateTime endDateTime = LocalDateTime.of(
+        now.toLocalDate().with(TemporalAdjusters.lastDayOfMonth()), LocalTime.MAX);
+
+    List<PostDto> postDtoList = postService.hotPost(page, size, startDateTime, endDateTime);
+    List<PostResponse> postResponseList = new ArrayList<>();
+
+    for (PostDto postDto : postDtoList) {
+      Long goodCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.GOOD);
+      Long badCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.BAD);
+
+      postResponseList.add(PostResponse.from(postDto, goodCount, badCount));
+    }
+
+    return ResponseEntity.ok().body(
+        PagePostResponse.of(postResponseList.size(), page, size, postResponseList));
   }
 }
