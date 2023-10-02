@@ -19,7 +19,7 @@ public class PostDto {
   private String title;
   private String content;
   private long view;
-  private Boolean isBlindYn;
+  private Boolean isBlind;
   private Category category;
   private Member member;
   private LocalDateTime createDateTime;
@@ -33,7 +33,7 @@ public class PostDto {
         .title(post.getTitle())
         .content(post.getContent())
         .view(post.getView())
-        .isBlindYn(post.getIsBlindYn())
+        .isBlind(post.isBlind())
         .category(post.getCategory())
         .member(post.getMember())
         .createDateTime(post.getCreateDateTime())

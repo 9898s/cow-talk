@@ -24,7 +24,7 @@ public class CategoryDto {
     return CategoryDto.builder()
         .id(category.getId())
         .name(category.getName())
-        .isReadOnly(category.getIsReadOnly())
+        .isReadOnly(category.isReadOnly())
         .createDateTime(category.getCreateDateTime())
         .updateDateTime(category.getUpdateDateTime())
         .deleteDateTime(category.getDeleteDateTime())

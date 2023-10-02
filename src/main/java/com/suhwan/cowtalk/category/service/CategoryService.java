@@ -37,7 +37,9 @@ public class CategoryService {
     Category category = categoryRepository.findById(id)
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 카테고리 번호입니다."));
 
-    if (categoryRepository.existsByName(request.getName())) {
+    // 이름만 바꿨을 경우
+    if (!request.getName().equals(category.getName()) &&
+        categoryRepository.existsByName(request.getName())) {
       throw new IllegalStateException("이미 존재하는 카테고리입니다.");
     }
 

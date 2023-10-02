@@ -27,7 +27,7 @@ public class Category extends BaseTimeEntity {
   private String name;
 
   @Column
-  private Boolean isReadOnly;
+  private boolean isReadOnly;
 
   @Column
   private LocalDateTime updateDateTime;

@@ -1,6 +1,7 @@
 package com.suhwan.cowtalk.post.controller;
 
 import com.suhwan.cowtalk.common.type.GoodBad;
+import com.suhwan.cowtalk.common.utility.DateUtility;
 import com.suhwan.cowtalk.post.model.DeletePostResponse;
 import com.suhwan.cowtalk.post.model.PagePostResponse;
 import com.suhwan.cowtalk.post.model.PostDto;
@@ -11,14 +12,10 @@ import com.suhwan.cowtalk.post.model.WritePostRequest;
 import com.suhwan.cowtalk.post.model.WritePostResponse;
 import com.suhwan.cowtalk.post.model.goodbad.GoodBadPostResponse;
 import com.suhwan.cowtalk.post.model.goodbad.PostGoodBadDto;
+import com.suhwan.cowtalk.post.service.PostApiService;
 import com.suhwan.cowtalk.post.service.PostGoodBadService;
 import com.suhwan.cowtalk.post.service.PostService;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +37,7 @@ public class PostController {
 
   private final PostService postService;
   private final PostGoodBadService postGoodBadService;
+  private final PostApiService postApiService;
 
   @PostMapping
   public ResponseEntity<?> writePost(@RequestBody WritePostRequest request) {
@@ -63,15 +61,7 @@ public class PostController {
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size
   ) {
-    List<PostDto> postDtoList = postService.getAllPost(page, size);
-    List<PostResponse> postResponseList = new ArrayList<>();
-
-    for (PostDto postDto : postDtoList) {
-      Long goodCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.GOOD);
-      Long badCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.BAD);
-
-      postResponseList.add(PostResponse.from(postDto, goodCount, badCount));
-    }
+    List<PostResponse> postResponseList = postApiService.getPostResponseList(page, size);
 
     return ResponseEntity.ok().body(
         PagePostResponse.of(postResponseList.size(), page, size, postResponseList));
@@ -83,15 +73,8 @@ public class PostController {
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "10") int size
   ) {
-    List<PostDto> postDtoList = postService.getAllCategoryPost(categoryId, page, size);
-    List<PostResponse> postResponseList = new ArrayList<>();
-
-    for (PostDto postDto : postDtoList) {
-      Long goodCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.GOOD);
-      Long badCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.BAD);
-
-      postResponseList.add(PostResponse.from(postDto, goodCount, badCount));
-    }
+    List<PostResponse> postResponseList =
+        postApiService.getCategoryPostResponseList(categoryId, page, size);
 
     return ResponseEntity.ok().body(
         PagePostResponse.of(postResponseList.size(), page, size, postResponseList));
@@ -132,18 +115,11 @@ public class PostController {
       @RequestParam(defaultValue = "10") int size
   ) {
 
-    LocalDateTime startDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.MIDNIGHT);
-    LocalDateTime endDateTime = startDateTime.plusDays(1).minusNanos(1);
+    LocalDateTime startDateTime = DateUtility.getStartOfDay();
+    LocalDateTime endDateTime = DateUtility.getEndOfDay();
 
-    List<PostDto> postDtoList = postService.hotPost(page, size, startDateTime, endDateTime);
-    List<PostResponse> postResponseList = new ArrayList<>();
-
-    for (PostDto postDto : postDtoList) {
-      Long goodCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.GOOD);
-      Long badCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.BAD);
-
-      postResponseList.add(PostResponse.from(postDto, goodCount, badCount));
-    }
+    List<PostResponse> postResponseList
+        = postApiService.getHotPostResponseList(page, size, startDateTime, endDateTime);
 
     return ResponseEntity.ok().body(
         PagePostResponse.of(postResponseList.size(), page, size, postResponseList));
@@ -156,24 +132,11 @@ public class PostController {
   ) {
 
     LocalDateTime now = LocalDateTime.now();
+    LocalDateTime startDateTime = DateUtility.getStartOfWeek(now);
+    LocalDateTime endDateTime = DateUtility.getEndOfWeek(now);
 
-    // 이번 주의 시작 날짜(월요일)
-    LocalDateTime startDateTime = now.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-        .withHour(0).withMinute(0).withSecond(0);
-
-    // 이번 주의 끝 날짜(일요일)
-    LocalDateTime endDateTime = now.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
-        .withHour(23).withMinute(59).withSecond(59);
-
-    List<PostDto> postDtoList = postService.hotPost(page, size, startDateTime, endDateTime);
-    List<PostResponse> postResponseList = new ArrayList<>();
-
-    for (PostDto postDto : postDtoList) {
-      Long goodCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.GOOD);
-      Long badCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.BAD);
-
-      postResponseList.add(PostResponse.from(postDto, goodCount, badCount));
-    }
+    List<PostResponse> postResponseList
+        = postApiService.getHotPostResponseList(page, size, startDateTime, endDateTime);
 
     return ResponseEntity.ok().body(
         PagePostResponse.of(postResponseList.size(), page, size, postResponseList));
@@ -186,24 +149,11 @@ public class PostController {
   ) {
 
     LocalDateTime now = LocalDateTime.now();
+    LocalDateTime startDateTime = DateUtility.getStartOfMonth(now);
+    LocalDateTime endDateTime = DateUtility.getEndOfMonth(now);
 
-    // 이번 달의 시작 날짜와 시간(1일 00:00:00)
-    LocalDateTime startDateTime = LocalDateTime.of(now.toLocalDate().withDayOfMonth(1),
-        LocalTime.MIN);
-
-    // 이번 달의 마지막 날짜와 시간(마지막일 23:59:59)
-    LocalDateTime endDateTime = LocalDateTime.of(
-        now.toLocalDate().with(TemporalAdjusters.lastDayOfMonth()), LocalTime.MAX);
-
-    List<PostDto> postDtoList = postService.hotPost(page, size, startDateTime, endDateTime);
-    List<PostResponse> postResponseList = new ArrayList<>();
-
-    for (PostDto postDto : postDtoList) {
-      Long goodCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.GOOD);
-      Long badCount = postGoodBadService.countGoodBad(postDto.getId(), GoodBad.BAD);
-
-      postResponseList.add(PostResponse.from(postDto, goodCount, badCount));
-    }
+    List<PostResponse> postResponseList
+        = postApiService.getHotPostResponseList(page, size, startDateTime, endDateTime);
 
     return ResponseEntity.ok().body(
         PagePostResponse.of(postResponseList.size(), page, size, postResponseList));

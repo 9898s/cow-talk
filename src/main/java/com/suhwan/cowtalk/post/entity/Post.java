@@ -37,7 +37,7 @@ public class Post extends BaseTimeEntity {
   private long view;
 
   @Column
-  private Boolean isBlindYn;
+  private boolean isBlind;
 
   @ManyToOne
   @JoinColumn(name = "category_id")
@@ -74,7 +74,7 @@ public class Post extends BaseTimeEntity {
   }
 
   public Post blind() {
-    this.isBlindYn = true;
+    this.isBlind = true;
 
     return this;
   }

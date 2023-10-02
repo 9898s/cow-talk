@@ -17,7 +17,7 @@ public class PostResponse {
   private String title;
   private String content;
   private long view;
-  private Boolean isBlindYn;
+  private Boolean isBlind;
   private String nickname;
 
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -39,7 +39,7 @@ public class PostResponse {
         .title(postDto.getTitle())
         .content(postDto.getContent())
         .view(postDto.getView())
-        .isBlindYn(postDto.getIsBlindYn())
+        .isBlind(postDto.getIsBlind())
         .nickname(postDto.getMember().getNickname())
         .createDateTime(postDto.getCreateDateTime())
         .updateDateTime(postDto.getUpdateDateTime())

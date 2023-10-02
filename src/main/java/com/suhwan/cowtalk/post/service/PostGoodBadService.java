@@ -42,7 +42,8 @@ public class PostGoodBadService {
     }
 
     // 블라인드 처리
-    if (postGoodBadRepository.countByPostAndGoodBad(post, GoodBad.BAD) >= BLIND_COUNT) {
+    if (!post.isBlind() &&
+        postGoodBadRepository.countByPostAndGoodBad(post, GoodBad.BAD) >= BLIND_COUNT) {
       post.blind();
     }
 

@@ -39,7 +39,7 @@ public class PostService {
     Category category = categoryRepository.findById(request.getCategoryId())
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 카테고리 번호입니다."));
 
-    if (Boolean.TRUE.equals(category.getIsReadOnly())) {
+    if (Boolean.TRUE.equals(category.isReadOnly())) {
       throw new IllegalStateException("읽기 전용 카테고리입니다.");
     }
 
@@ -97,7 +97,7 @@ public class PostService {
       throw new IllegalStateException("작성한 게시글이 아닙니다.");
     }
 
-    if (Boolean.TRUE.equals(post.getIsBlindYn()) || post.getDeleteDateTime() != null) {
+    if (Boolean.TRUE.equals(post.isBlind()) || post.getDeleteDateTime() != null) {
       throw new IllegalStateException("수정할 수 없는 게시글입니다.");
     }
 
