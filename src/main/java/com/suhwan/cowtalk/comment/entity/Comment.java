@@ -59,4 +59,10 @@ public class Comment extends BaseTimeEntity {
 
     return this;
   }
+
+  public Comment blind() {
+    this.isBlind = true;
+
+    return this;
+  }
 }

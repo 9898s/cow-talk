@@ -8,7 +8,11 @@ import com.suhwan.cowtalk.comment.model.UpdateCommentRequest;
 import com.suhwan.cowtalk.comment.model.UpdateCommentResponse;
 import com.suhwan.cowtalk.comment.model.WriteCommentRequest;
 import com.suhwan.cowtalk.comment.model.WriteCommentResponse;
+import com.suhwan.cowtalk.comment.model.goodbad.CommentGoodBadDto;
+import com.suhwan.cowtalk.comment.model.goodbad.GoodBadCommentResponse;
+import com.suhwan.cowtalk.comment.service.CommentGoodBadService;
 import com.suhwan.cowtalk.comment.service.CommentService;
+import com.suhwan.cowtalk.common.type.GoodBad;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentController {
 
   private final CommentService commentService;
+  private final CommentGoodBadService commentGoodBadService;
 
   @PostMapping
   public ResponseEntity<?> writeComment(@RequestBody WriteCommentRequest request) {
@@ -61,5 +66,19 @@ public class CommentController {
     CommentDto commentDto = commentService.deleteComment(id);
 
     return ResponseEntity.ok().body(DeleteCommentResponse.from(commentDto));
+  }
+
+  @PostMapping("/{id}/good")
+  public ResponseEntity<?> goodComment(@PathVariable Long id) {
+    CommentGoodBadDto commentGoodBadDto = commentGoodBadService.goodBadComment(id, GoodBad.GOOD);
+
+    return ResponseEntity.ok().body(GoodBadCommentResponse.from(commentGoodBadDto));
+  }
+
+  @PostMapping("/{id}/bad")
+  public ResponseEntity<?> badComment(@PathVariable Long id) {
+    CommentGoodBadDto commentGoodBadDto = commentGoodBadService.goodBadComment(id, GoodBad.BAD);
+
+    return ResponseEntity.ok().body(GoodBadCommentResponse.from(commentGoodBadDto));
   }
 }
