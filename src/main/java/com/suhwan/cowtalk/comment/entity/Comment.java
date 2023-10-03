@@ -46,4 +46,11 @@ public class Comment extends BaseTimeEntity {
 
   @Column
   private LocalDateTime deleteDateTime;
+
+  public Comment update(String content) {
+    this.content = content;
+    this.updateDateTime = LocalDateTime.now();
+
+    return this;
+  }
 }
