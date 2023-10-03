@@ -10,6 +10,8 @@ import com.suhwan.cowtalk.member.entity.Member;
 import com.suhwan.cowtalk.member.repository.MemberRepository;
 import com.suhwan.cowtalk.post.entity.Post;
 import com.suhwan.cowtalk.post.repository.PostRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +42,19 @@ public class CommentService {
                 .build()
         )
     );
+  }
+
+  // 게시글 댓글 조회
+  @Transactional(readOnly = true)
+  public List<CommentDto> getPostComment(Long postId) {
+    Post post = postRepository.findById(postId)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+
+    List<Comment> commentList = commentRepository.findAllByPost(post);
+
+    return commentList.stream()
+        .map(CommentDto::fromEntity)
+        .collect(Collectors.toList());
   }
 
   // 댓글 수정
