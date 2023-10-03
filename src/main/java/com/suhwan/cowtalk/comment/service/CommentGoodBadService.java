@@ -42,37 +42,45 @@ public class CommentGoodBadService {
 
     String commentGoodBadId = id + ":" + member.getId();
     if (commentGoodBadCacheRepository.existsById(commentGoodBadId)) {
-      throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다..");
+      throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다.");
     } else {
       if (commentGoodBadRepository.existsByCommentAndMember(comment, member)) {
+        // redis에 저장
+        saveCache(id, member, commentGoodBadId);
+
         throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다.");
       }
-
-      // 블라인드 처리
-      if (!comment.isBlind() &&
-          commentGoodBadRepository.countByCommentAndGoodBad(comment, GoodBad.BAD) >= BLIND_COUNT) {
-        comment.blind();
-      }
-
-      // 캐시 저장
-      commentGoodBadCacheRepository.save(
-          CommentGoodBadCache.builder()
-              .id(commentGoodBadId)
-              .commentId(id)
-              .memberId(member.getId())
-              .build()
-      );
-
-      return CommentGoodBadDto.fromEntity(
-          commentGoodBadRepository.save(
-              CommentGoodBad.builder()
-                  .comment(comment)
-                  .member(member)
-                  .goodBad(goodBad)
-                  .build()
-          )
-      );
     }
+
+    // 블라인드 처리
+    if (!comment.isBlind() &&
+        commentGoodBadRepository.countByCommentAndGoodBad(comment, GoodBad.BAD) >= BLIND_COUNT) {
+      comment.blind();
+    }
+
+    // redis에 저장
+    saveCache(id, member, commentGoodBadId);
+
+    return CommentGoodBadDto.fromEntity(
+        commentGoodBadRepository.save(
+            CommentGoodBad.builder()
+                .comment(comment)
+                .member(member)
+                .goodBad(goodBad)
+                .build()
+        )
+    );
+  }
+
+  private void saveCache(Long id, Member member, String commentGoodBadId) {
+    // 캐시 저장
+    commentGoodBadCacheRepository.save(
+        CommentGoodBadCache.builder()
+            .id(commentGoodBadId)
+            .commentId(id)
+            .memberId(member.getId())
+            .build()
+    );
   }
 
   public Long countGoodBad(Long id, GoodBad goodBad) {
