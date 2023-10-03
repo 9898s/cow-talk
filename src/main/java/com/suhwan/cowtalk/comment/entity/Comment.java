@@ -53,4 +53,10 @@ public class Comment extends BaseTimeEntity {
 
     return this;
   }
+
+  public Comment delete() {
+    this.deleteDateTime = LocalDateTime.now();
+
+    return this;
+  }
 }

@@ -60,4 +60,26 @@ public class CommentService {
 
     return CommentDto.fromEntity(comment);
   }
+
+  // 댓글 삭제
+  @Transactional
+  public CommentDto deleteComment(Long id) {
+    Comment comment = commentRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 댓글 번호입니다."));
+
+    String email = SecurityUtil.getLoginMemberEmail();
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+
+    if (comment.getMember() != member) {
+      throw new IllegalStateException("본인이 작성한 댓글이 아닙니다.");
+    }
+    if (comment.getDeleteDateTime() != null) {
+      throw new IllegalStateException("이미 삭제된 댓글입니다.");
+    }
+
+    comment.delete();
+
+    return CommentDto.fromEntity(comment);
+  }
 }
