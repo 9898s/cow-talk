@@ -12,7 +12,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +32,7 @@ public class PostGoodBad extends BaseTimeEntity {
   @Column
   private GoodBad goodBad;
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "post_id")
   private Post post;
 
