@@ -10,5 +10,5 @@ public interface CommentGoodBadRepository extends JpaRepository<CommentGoodBad, 
 
   boolean existsByCommentAndMember(Comment comment, Member member);
 
-  int countByCommentAndGoodBad(Comment comment, GoodBad goodBad);
+  long countByCommentAndGoodBad(Comment comment, GoodBad goodBad);
 }

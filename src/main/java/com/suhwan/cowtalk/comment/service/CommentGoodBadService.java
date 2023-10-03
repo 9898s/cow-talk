@@ -57,4 +57,11 @@ public class CommentGoodBadService {
         )
     );
   }
+
+  public Long countGoodBad(Long id, GoodBad goodBad) {
+    Comment comment = commentRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 댓글 번호입니다."));
+
+    return commentGoodBadRepository.countByCommentAndGoodBad(comment, goodBad);
+  }
 }

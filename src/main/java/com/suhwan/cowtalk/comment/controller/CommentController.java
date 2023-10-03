@@ -10,11 +10,11 @@ import com.suhwan.cowtalk.comment.model.WriteCommentRequest;
 import com.suhwan.cowtalk.comment.model.WriteCommentResponse;
 import com.suhwan.cowtalk.comment.model.goodbad.CommentGoodBadDto;
 import com.suhwan.cowtalk.comment.model.goodbad.GoodBadCommentResponse;
+import com.suhwan.cowtalk.comment.service.CommentApiService;
 import com.suhwan.cowtalk.comment.service.CommentGoodBadService;
 import com.suhwan.cowtalk.comment.service.CommentService;
 import com.suhwan.cowtalk.common.type.GoodBad;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,6 +33,7 @@ public class CommentController {
 
   private final CommentService commentService;
   private final CommentGoodBadService commentGoodBadService;
+  private final CommentApiService commentApiService;
 
   @PostMapping
   public ResponseEntity<?> writeComment(@RequestBody WriteCommentRequest request) {
@@ -43,11 +44,7 @@ public class CommentController {
 
   @GetMapping("/{postId}")
   public ResponseEntity<?> getPostComment(@PathVariable Long postId) {
-    List<CommentDto> commentDtoList = commentService.getPostComment(postId);
-
-    List<CommentResponse> commentResponseList = commentDtoList.stream()
-        .map(CommentResponse::from)
-        .collect(Collectors.toList());
+    List<CommentResponse> commentResponseList = commentApiService.getCommentResponseList(postId);
 
     return ResponseEntity.ok()
         .body(CommentResponseList.of(commentResponseList.size(), commentResponseList));

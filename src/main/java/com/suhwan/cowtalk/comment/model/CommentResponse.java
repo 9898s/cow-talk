@@ -28,7 +28,10 @@ public class CommentResponse {
   @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime deleteDateTime;
 
-  public static CommentResponse from(CommentDto commentDto) {
+  private Long goodCount;
+  private Long badCount;
+
+  public static CommentResponse from(CommentDto commentDto, Long goodCount, Long badCount) {
 
     return CommentResponse.builder()
         .id(commentDto.getId())
@@ -39,6 +42,8 @@ public class CommentResponse {
         .createDateTime(commentDto.getCreateDateTime())
         .updateDateTime(commentDto.getUpdateDateTime())
         .deleteDateTime(commentDto.getDeleteDateTime())
+        .goodCount(goodCount)
+        .badCount(badCount)
         .build();
   }
 }
