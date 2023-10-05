@@ -1,12 +1,11 @@
-package com.suhwan.cowtalk.post.entity;
+package com.suhwan.cowtalk.comment.entity;
 
 import com.suhwan.cowtalk.common.entity.BaseTimeEntity;
-import com.suhwan.cowtalk.common.type.GoodBad;
 import com.suhwan.cowtalk.member.entity.Member;
+import com.suhwan.cowtalk.post.entity.Post;
+import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -22,15 +21,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 @Entity
-public class PostGoodBad extends BaseTimeEntity {
+public class Comment extends BaseTimeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private String content;
+
   @Column
-  private GoodBad goodBad;
+  private boolean isBlind;
 
   @ManyToOne
   @JoinColumn(name = "post_id")
@@ -39,4 +40,29 @@ public class PostGoodBad extends BaseTimeEntity {
   @ManyToOne
   @JoinColumn(name = "member_id")
   private Member member;
+
+  @Column
+  private LocalDateTime updateDateTime;
+
+  @Column
+  private LocalDateTime deleteDateTime;
+
+  public Comment update(String content) {
+    this.content = content;
+    this.updateDateTime = LocalDateTime.now();
+
+    return this;
+  }
+
+  public Comment delete() {
+    this.deleteDateTime = LocalDateTime.now();
+
+    return this;
+  }
+
+  public Comment blind() {
+    this.isBlind = true;
+
+    return this;
+  }
 }

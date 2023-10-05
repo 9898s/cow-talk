@@ -1,4 +1,4 @@
-package com.suhwan.cowtalk.post.entity;
+package com.suhwan.cowtalk.comment.entity;
 
 import com.suhwan.cowtalk.common.entity.BaseTimeEntity;
 import com.suhwan.cowtalk.common.type.GoodBad;
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 @Entity
-public class PostGoodBad extends BaseTimeEntity {
+public class CommentGoodBad extends BaseTimeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,8 +33,8 @@ public class PostGoodBad extends BaseTimeEntity {
   private GoodBad goodBad;
 
   @ManyToOne
-  @JoinColumn(name = "post_id")
-  private Post post;
+  @JoinColumn(name = "comment_id")
+  private Comment comment;
 
   @ManyToOne
   @JoinColumn(name = "member_id")
