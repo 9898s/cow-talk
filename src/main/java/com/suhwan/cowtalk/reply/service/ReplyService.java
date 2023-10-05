@@ -59,4 +59,26 @@ public class ReplyService {
 
     return ReplyDto.fromEntity(reply);
   }
+
+  // 댓글 삭제
+  @Transactional
+  public ReplyDto deleteReply(Long id) {
+    Reply reply = replyRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 대댓글 번호입니다."));
+
+    String email = SecurityUtil.getLoginMemberEmail();
+    Member member = memberRepository.findByEmail(email)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+
+    if (reply.getMember() != member) {
+      throw new IllegalStateException("본인이 작성한 대댓글이 아닙니다.");
+    }
+    if (reply.getDeleteDateTime() != null) {
+      throw new IllegalStateException("이미 삭제된 댓글입니다.");
+    }
+
+    reply.delete();
+
+    return ReplyDto.fromEntity(reply);
+  }
 }

@@ -53,4 +53,10 @@ public class Reply extends BaseTimeEntity {
 
     return this;
   }
+
+  public Reply delete() {
+    this.deleteDateTime = LocalDateTime.now();
+
+    return this;
+  }
 }

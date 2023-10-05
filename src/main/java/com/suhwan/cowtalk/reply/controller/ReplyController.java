@@ -1,5 +1,6 @@
 package com.suhwan.cowtalk.reply.controller;
 
+import com.suhwan.cowtalk.reply.model.DeleteReplyResponse;
 import com.suhwan.cowtalk.reply.model.ReplyDto;
 import com.suhwan.cowtalk.reply.model.UpdateReplyRequest;
 import com.suhwan.cowtalk.reply.model.UpdateReplyResponse;
@@ -8,6 +9,7 @@ import com.suhwan.cowtalk.reply.model.WriteReplyResponse;
 import com.suhwan.cowtalk.reply.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,5 +37,12 @@ public class ReplyController {
     ReplyDto replyDto = replyService.updateReply(id, request);
 
     return ResponseEntity.ok().body(UpdateReplyResponse.from(replyDto));
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<?> deleteReply(@PathVariable Long id) {
+    ReplyDto replyDto = replyService.deleteReply(id);
+
+    return ResponseEntity.ok().body(DeleteReplyResponse.from(replyDto));
   }
 }
