@@ -1,11 +1,15 @@
 package com.suhwan.cowtalk.reply.controller;
 
+import com.suhwan.cowtalk.common.type.GoodBad;
 import com.suhwan.cowtalk.reply.model.DeleteReplyResponse;
 import com.suhwan.cowtalk.reply.model.ReplyDto;
 import com.suhwan.cowtalk.reply.model.UpdateReplyRequest;
 import com.suhwan.cowtalk.reply.model.UpdateReplyResponse;
 import com.suhwan.cowtalk.reply.model.WriteReplyRequest;
 import com.suhwan.cowtalk.reply.model.WriteReplyResponse;
+import com.suhwan.cowtalk.reply.model.goodbad.GoodBadReplyResponse;
+import com.suhwan.cowtalk.reply.model.goodbad.ReplyGoodBadDto;
+import com.suhwan.cowtalk.reply.service.ReplyGoodBadService;
 import com.suhwan.cowtalk.reply.service.ReplyService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReplyController {
 
   private final ReplyService replyService;
+  private final ReplyGoodBadService replyGoodBadService;
 
   @PostMapping
   public ResponseEntity<?> writeReply(@RequestBody WriteReplyRequest request) {
@@ -44,5 +49,19 @@ public class ReplyController {
     ReplyDto replyDto = replyService.deleteReply(id);
 
     return ResponseEntity.ok().body(DeleteReplyResponse.from(replyDto));
+  }
+
+  @PostMapping("/{id}/good")
+  public ResponseEntity<?> goodReply(@PathVariable Long id) {
+    ReplyGoodBadDto replyGoodBadDto = replyGoodBadService.goodBadReply(id, GoodBad.GOOD);
+
+    return ResponseEntity.ok().body(GoodBadReplyResponse.from(replyGoodBadDto));
+  }
+
+  @PostMapping("/{id}/bad")
+  public ResponseEntity<?> badComment(@PathVariable Long id) {
+    ReplyGoodBadDto replyGoodBadDto = replyGoodBadService.goodBadReply(id, GoodBad.BAD);
+
+    return ResponseEntity.ok().body(GoodBadReplyResponse.from(replyGoodBadDto));
   }
 }

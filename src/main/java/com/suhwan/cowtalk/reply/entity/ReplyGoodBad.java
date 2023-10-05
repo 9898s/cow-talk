@@ -1,11 +1,12 @@
 package com.suhwan.cowtalk.reply.entity;
 
-import com.suhwan.cowtalk.comment.entity.Comment;
 import com.suhwan.cowtalk.common.entity.BaseTimeEntity;
+import com.suhwan.cowtalk.common.type.GoodBad;
 import com.suhwan.cowtalk.member.entity.Member;
-import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,48 +22,21 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 @Entity
-public class Reply extends BaseTimeEntity {
+public class ReplyGoodBad extends BaseTimeEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = false)
-  private String content;
-
+  @Enumerated(EnumType.STRING)
   @Column
-  private boolean isBlind;
+  private GoodBad goodBad;
 
   @ManyToOne
-  @JoinColumn(name = "comment_id")
-  private Comment comment;
+  @JoinColumn(name = "reply_id")
+  private Reply reply;
 
   @ManyToOne
   @JoinColumn(name = "member_id")
   private Member member;
-
-  @Column
-  private LocalDateTime updateDateTime;
-
-  @Column
-  private LocalDateTime deleteDateTime;
-
-  public Reply update(String content) {
-    this.content = content;
-    this.updateDateTime = LocalDateTime.now();
-
-    return this;
-  }
-
-  public Reply delete() {
-    this.deleteDateTime = LocalDateTime.now();
-
-    return this;
-  }
-
-  public Reply blind() {
-    this.isBlind = true;
-
-    return this;
-  }
 }
