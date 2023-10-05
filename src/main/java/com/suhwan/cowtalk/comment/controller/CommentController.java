@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -42,8 +43,8 @@ public class CommentController {
     return ResponseEntity.ok().body(WriteCommentResponse.from(commentDto));
   }
 
-  @GetMapping("/{postId}")
-  public ResponseEntity<?> getPostComment(@PathVariable Long postId) {
+  @GetMapping
+  public ResponseEntity<?> getPostComment(@RequestParam Long postId) {
     List<CommentResponse> commentResponseList = commentApiService.getCommentResponseList(postId);
 
     return ResponseEntity.ok()

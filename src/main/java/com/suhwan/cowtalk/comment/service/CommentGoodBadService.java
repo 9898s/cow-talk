@@ -40,17 +40,7 @@ public class CommentGoodBadService {
       throw new IllegalStateException("자신이 작성한 댓글에 좋아요/싫어요를 누를 수 없습니다.");
     }
 
-    String commentGoodBadId = id + ":" + member.getId();
-    if (commentGoodBadCacheRepository.existsById(commentGoodBadId)) {
-      throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다.");
-    } else {
-      if (commentGoodBadRepository.existsByCommentAndMember(comment, member)) {
-        // redis에 저장
-        saveCache(id, member, commentGoodBadId);
-
-        throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다.");
-      }
-    }
+    String commentGoodBadId = getString(id, comment, member);
 
     // 블라인드 처리
     if (!comment.isBlind() &&
@@ -70,6 +60,21 @@ public class CommentGoodBadService {
                 .build()
         )
     );
+  }
+
+  private String getString(Long id, Comment comment, Member member) {
+    String commentGoodBadId = id + ":" + member.getId();
+    if (commentGoodBadCacheRepository.existsById(commentGoodBadId)) {
+      throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다.");
+    } else {
+      if (commentGoodBadRepository.existsByCommentAndMember(comment, member)) {
+        // redis에 저장
+        saveCache(id, member, commentGoodBadId);
+
+        throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다.");
+      }
+    }
+    return commentGoodBadId;
   }
 
   private void saveCache(Long id, Member member, String commentGoodBadId) {
