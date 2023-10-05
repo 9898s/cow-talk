@@ -1,5 +1,12 @@
 package com.suhwan.cowtalk.reply.service;
 
+import static com.suhwan.cowtalk.common.type.ErrorCode.ALREADY_GOOD_BAD_REPLY;
+import static com.suhwan.cowtalk.common.type.ErrorCode.CANNOT_GOOD_BAD_OWN_REPLY;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_MEMBER_EMAIL;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_REPLY_ID;
+
+import com.suhwan.cowtalk.common.exception.MemberException;
+import com.suhwan.cowtalk.common.exception.ReplyException;
 import com.suhwan.cowtalk.common.security.SecurityUtil;
 import com.suhwan.cowtalk.common.type.GoodBad;
 import com.suhwan.cowtalk.member.entity.Member;
@@ -30,14 +37,14 @@ public class ReplyGoodBadService {
   @Transactional
   public ReplyGoodBadDto goodBadReply(Long id, GoodBad goodBad) {
     Reply reply = replyRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 대댓글 번호입니다."));
+        .orElseThrow(() -> new ReplyException(INVALID_REPLY_ID));
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     if (reply.getMember() == member) {
-      throw new IllegalStateException("자신이 작성한 대댓글에 좋아요/싫어요를 누를 수 없습니다.");
+      throw new ReplyException(CANNOT_GOOD_BAD_OWN_REPLY);
     }
 
     String replyGoodBadId = getString(id, reply, member);
@@ -65,13 +72,13 @@ public class ReplyGoodBadService {
   private String getString(Long id, Reply reply, Member member) {
     String replyGoodBadId = id + ":" + member.getId();
     if (replyGoodBadCacheRepository.existsById(replyGoodBadId)) {
-      throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다.");
+      throw new ReplyException(ALREADY_GOOD_BAD_REPLY);
     } else {
       if (replyGoodBadRepository.existsByReplyAndMember(reply, member)) {
         // redis에 저장
         saveCache(id, member, replyGoodBadId);
 
-        throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다.");
+        throw new ReplyException(ALREADY_GOOD_BAD_REPLY);
       }
     }
     return replyGoodBadId;
@@ -90,7 +97,7 @@ public class ReplyGoodBadService {
 
   public Long countGoodBad(Long id, GoodBad goodBad) {
     Reply reply = replyRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 대댓글 번호입니다."));
+        .orElseThrow(() -> new ReplyException(INVALID_REPLY_ID));
 
     return replyGoodBadRepository.countByReplyAndGoodBad(reply, goodBad);
   }

@@ -1,10 +1,15 @@
 package com.suhwan.cowtalk.category.service;
 
+import static com.suhwan.cowtalk.common.type.ErrorCode.ALREADY_DELETE_CATEGORY_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.ALREADY_EXIST_CATEGORY;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_CATEGORY_ID;
+
 import com.suhwan.cowtalk.category.entity.Category;
 import com.suhwan.cowtalk.category.model.AddCategoryRequest;
 import com.suhwan.cowtalk.category.model.CategoryDto;
 import com.suhwan.cowtalk.category.model.UpdateCategoryRequest;
 import com.suhwan.cowtalk.category.repository.CategoryRepository;
+import com.suhwan.cowtalk.common.exception.CategoryException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +23,7 @@ public class CategoryService {
   // 카테고리 추가
   public CategoryDto addCategory(AddCategoryRequest request) {
     if (categoryRepository.existsByName(request.getName())) {
-      throw new IllegalStateException("이미 존재하는 카테고리입니다.");
+      throw new CategoryException(ALREADY_EXIST_CATEGORY);
     }
 
     return CategoryDto.fromEntity(
@@ -35,12 +40,12 @@ public class CategoryService {
   @Transactional
   public CategoryDto updateCategory(Long id, UpdateCategoryRequest request) {
     Category category = categoryRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 카테고리 번호입니다."));
+        .orElseThrow(() -> new CategoryException(INVALID_CATEGORY_ID));
 
     // 이름만 바꿨을 경우
     if (!request.getName().equals(category.getName()) &&
         categoryRepository.existsByName(request.getName())) {
-      throw new IllegalStateException("이미 존재하는 카테고리입니다.");
+      throw new CategoryException(ALREADY_EXIST_CATEGORY);
     }
 
     category.update(request.getName(), request.getIsReadOnly());
@@ -52,10 +57,10 @@ public class CategoryService {
   @Transactional
   public CategoryDto deleteCategory(Long id) {
     Category category = categoryRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 카테고리 번호입니다."));
+        .orElseThrow(() -> new CategoryException(INVALID_CATEGORY_ID));
 
     if (category.getDeleteDateTime() != null) {
-      throw new IllegalStateException("이미 삭제된 카테고리 번호입니다.");
+      throw new CategoryException(ALREADY_DELETE_CATEGORY_ID);
     }
 
     category.delete();

@@ -1,5 +1,12 @@
 package com.suhwan.cowtalk.post.service;
 
+import static com.suhwan.cowtalk.common.type.ErrorCode.ALREADY_GOOD_BAD_POST;
+import static com.suhwan.cowtalk.common.type.ErrorCode.CANNOT_GOOD_BAD_OWN_POST;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_MEMBER_EMAIL;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_POST_ID;
+
+import com.suhwan.cowtalk.common.exception.MemberException;
+import com.suhwan.cowtalk.common.exception.PostException;
 import com.suhwan.cowtalk.common.security.SecurityUtil;
 import com.suhwan.cowtalk.common.type.GoodBad;
 import com.suhwan.cowtalk.member.entity.Member;
@@ -27,18 +34,18 @@ public class PostGoodBadService {
   @Transactional
   public PostGoodBadDto goodBadPost(Long id, GoodBad goodBad) {
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+        .orElseThrow(() -> new PostException(INVALID_POST_ID));
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     if (post.getMember() == member) {
-      throw new IllegalStateException("자신이 작성한 게시글에 좋아요를 누를 수 없습니다.");
+      throw new PostException(CANNOT_GOOD_BAD_OWN_POST);
     }
 
     if (postGoodBadRepository.existsByPostAndMember(post, member)) {
-      throw new IllegalStateException("이미 좋아요 또는 싫어요를 누르셨습니다.");
+      throw new PostException(ALREADY_GOOD_BAD_POST);
     }
 
     // 블라인드 처리
@@ -61,7 +68,7 @@ public class PostGoodBadService {
   // 게시글 좋아요/싫어요 개수 조회
   public Long countGoodBad(Long id, GoodBad goodBad) {
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+        .orElseThrow(() -> new PostException(INVALID_POST_ID));
 
     return postGoodBadRepository.countByPostAndGoodBad(post, goodBad);
   }

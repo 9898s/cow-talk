@@ -1,13 +1,18 @@
 package com.suhwan.cowtalk.coin.service;
 
+import static com.suhwan.cowtalk.common.type.ErrorCode.API_CLIENT_ERROR;
+import static com.suhwan.cowtalk.common.type.ErrorCode.API_SERVER_ERROR;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_EXCHANGE_NAME;
+
 import com.suhwan.cowtalk.coin.entity.Coin;
 import com.suhwan.cowtalk.coin.model.CoinDto;
 import com.suhwan.cowtalk.coin.model.CoinGeckoApiResponse;
 import com.suhwan.cowtalk.coin.model.CoinGeckoApiTicker;
 import com.suhwan.cowtalk.coin.repository.CoinRepository;
+import com.suhwan.cowtalk.common.exception.ApiException;
+import com.suhwan.cowtalk.common.exception.ExchangeException;
 import com.suhwan.cowtalk.exchange.entity.Exchange;
 import com.suhwan.cowtalk.exchange.repository.ExchangeRepository;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,7 +37,7 @@ public class CoinGeckoApiService {
 
   public List<CoinDto> fetchCoinList(String exchangeName, int page) {
     Exchange exchange = exchangeRepository.findByEnglishName(exchangeName)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 이름입니다."));
+        .orElseThrow(() -> new ExchangeException(INVALID_EXCHANGE_NAME));
 
     String apiUrl = String.format(COIN_GECKO_API_URL, exchangeName);
 
@@ -61,10 +66,10 @@ public class CoinGeckoApiService {
         )
         .retrieve()
         .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
-          return Mono.error(new IllegalStateException("클라이언트 에러가 발생했습니다."));
+          return Mono.error(new ApiException(API_CLIENT_ERROR));
         })
         .onStatus(HttpStatus::is5xxServerError, clientResponse -> {
-          return Mono.error(new IllegalStateException("CoinGecko API 서버에서 에러가 발생했습니다."));
+          return Mono.error(new ApiException(API_SERVER_ERROR));
         })
         .bodyToMono(CoinGeckoApiResponse.class)
         .flux()

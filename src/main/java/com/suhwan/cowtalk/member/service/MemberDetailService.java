@@ -1,5 +1,8 @@
 package com.suhwan.cowtalk.member.service;
 
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_MEMBER_EMAIL;
+
+import com.suhwan.cowtalk.common.exception.MemberException;
 import com.suhwan.cowtalk.member.entity.Member;
 import com.suhwan.cowtalk.member.entity.MemberDetails;
 import com.suhwan.cowtalk.member.repository.MemberRepository;
@@ -18,7 +21,7 @@ public class MemberDetailService implements UserDetailsService {
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     Member member = memberRepository.findByEmail(username)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     return new MemberDetails(member);
   }

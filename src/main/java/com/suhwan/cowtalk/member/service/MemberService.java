@@ -1,8 +1,22 @@
 package com.suhwan.cowtalk.member.service;
 
+import static com.suhwan.cowtalk.common.type.ErrorCode.ALREADY_DELETE_MEMBER_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_MEMBER_EMAIL;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_MEMBER_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_MEMBER_UUID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_REFRESH_TOKEN;
+import static com.suhwan.cowtalk.common.type.ErrorCode.NICKNAME_CHANGE_UNAVAILABLE;
+import static com.suhwan.cowtalk.common.type.ErrorCode.NOT_REGISTERED_EMAIL;
+import static com.suhwan.cowtalk.common.type.ErrorCode.PASSWORD_MISMATCH;
+import static com.suhwan.cowtalk.common.type.ErrorCode.UNVERIFIED_MEMBER;
+import static com.suhwan.cowtalk.common.type.ErrorCode.USING_MEMBER_EMAIL;
+import static com.suhwan.cowtalk.common.type.ErrorCode.USING_MEMBER_NICKNAME;
+
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.suhwan.cowtalk.common.component.MailComponent;
+import com.suhwan.cowtalk.common.exception.MemberException;
+import com.suhwan.cowtalk.common.exception.TokenException;
 import com.suhwan.cowtalk.common.security.jwt.TokenProvider;
 import com.suhwan.cowtalk.common.security.jwt.TokenRequest;
 import com.suhwan.cowtalk.common.security.jwt.TokenResponse;
@@ -47,10 +61,10 @@ public class MemberService {
   // 회원가입
   public MemberDto signUp(SignUpMemberRequest request) {
     if (memberRepository.existsByEmail(request.getEmail())) {
-      throw new IllegalStateException("이미 사용중인 이메일입니다.");
+      throw new MemberException(USING_MEMBER_EMAIL);
     }
     if (memberRepository.existsByNickname(request.getNickname())) {
-      throw new IllegalStateException("이미 사용중인 닉네임입니다.");
+      throw new MemberException(USING_MEMBER_NICKNAME);
     }
 
     String uuid = UUID.randomUUID().toString();
@@ -79,14 +93,14 @@ public class MemberService {
   // 로그인
   public MemberDto signIn(SignInMemberRequest request) {
     Member member = memberRepository.findByEmail(request.getEmail())
-        .orElseThrow(() -> new IllegalStateException("가입된 이메일이 아닙니다."));
+        .orElseThrow(() -> new MemberException(NOT_REGISTERED_EMAIL));
 
     if (!bCryptPasswordEncoder.matches(request.getPassword(), member.getPassword())) {
-      throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+      throw new MemberException(PASSWORD_MISMATCH);
     }
 
     if (!member.isEmailAuthYn()) {
-      throw new IllegalStateException("인증된 회원이 아닙니다.");
+      throw new MemberException(UNVERIFIED_MEMBER);
     }
 
     return MemberDto.fromEntity(member);
@@ -96,7 +110,7 @@ public class MemberService {
   @Transactional
   public MemberDto emailAuth(String uuid) {
     Member member = memberRepository.findByUuid(uuid)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 UUID입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_UUID));
 
     member.authorization();
 
@@ -106,10 +120,10 @@ public class MemberService {
   // 토큰 재발급
   public TokenResponse refresh(TokenRequest request) {
     RefreshToken refreshToken = refreshTokenRepository.findById(request.getRefreshToken())
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 리프레쉬 토큰입니다."));
+        .orElseThrow(() -> new TokenException(INVALID_REFRESH_TOKEN));
 
     Member member = memberRepository.findByEmail(refreshToken.getMemberEmail())
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 회원 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     String accessToken = tokenProvider.createToken(refreshToken.getMemberEmail(),
         member.getRoles());
@@ -121,12 +135,12 @@ public class MemberService {
   @Transactional
   public MemberDto updateMember(Long id, UpdateMemberRequest request) {
     Member member = memberRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 회원 번호입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_ID));
 
     LocalDateTime updateDateTime = member.getUpdateDateTime();
     if (updateDateTime != null && updateDateTime.isBefore(
         updateDateTime.plusMonths(MEMBER_UPDATE_PERIOD_MONTH))) {
-      throw new IllegalStateException("닉네임을 아직 변경할 수 없습니다.");
+      throw new MemberException(NICKNAME_CHANGE_UNAVAILABLE);
     }
 
     member.update(request.getNickname());
@@ -138,7 +152,7 @@ public class MemberService {
   @Transactional
   public MemberDto uploadMember(Long id, MultipartFile file) {
     Member member = memberRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 회원 번호입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_ID));
 
     ObjectMetadata metadata = new ObjectMetadata();
     metadata.setContentType(file.getContentType());
@@ -175,7 +189,7 @@ public class MemberService {
   @Transactional(readOnly = true)
   public MemberDto getMember(Long id) {
     Member member = memberRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 회원 번호입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_ID));
 
     return MemberDto.fromEntity(member);
   }
@@ -184,10 +198,10 @@ public class MemberService {
   @Transactional
   public MemberDto deleteMember(Long id) {
     Member member = memberRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 회원 번호입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_ID));
 
     if (member.getDeleteDateTime() != null) {
-      throw new IllegalStateException("이미 삭제된 회원 번호입니다.");
+      throw new MemberException(ALREADY_DELETE_MEMBER_ID);
     }
 
     member.delete();

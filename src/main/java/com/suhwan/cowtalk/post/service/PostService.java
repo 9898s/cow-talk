@@ -1,7 +1,17 @@
 package com.suhwan.cowtalk.post.service;
 
+import static com.suhwan.cowtalk.common.type.ErrorCode.ALREADY_DELETE_POST;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_CATEGORY_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_MEMBER_EMAIL;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_POST_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.NOT_OWN_POST;
+import static com.suhwan.cowtalk.common.type.ErrorCode.READ_ONLY_CATEGORY;
+
 import com.suhwan.cowtalk.category.entity.Category;
 import com.suhwan.cowtalk.category.repository.CategoryRepository;
+import com.suhwan.cowtalk.common.exception.CategoryException;
+import com.suhwan.cowtalk.common.exception.MemberException;
+import com.suhwan.cowtalk.common.exception.PostException;
 import com.suhwan.cowtalk.common.security.SecurityUtil;
 import com.suhwan.cowtalk.member.entity.Member;
 import com.suhwan.cowtalk.member.repository.MemberRepository;
@@ -37,15 +47,15 @@ public class PostService {
   // 게시글 작성
   public PostDto writePost(WritePostRequest request) {
     Category category = categoryRepository.findById(request.getCategoryId())
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 카테고리 번호입니다."));
+        .orElseThrow(() -> new CategoryException(INVALID_CATEGORY_ID));
 
     if (Boolean.TRUE.equals(category.isReadOnly())) {
-      throw new IllegalStateException("읽기 전용 카테고리입니다.");
+      throw new CategoryException(READ_ONLY_CATEGORY);
     }
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     return PostDto.fromEntity(
         postRepository.save(
@@ -63,7 +73,7 @@ public class PostService {
   @Transactional
   public PostDto getPost(Long id, HttpServletRequest request) {
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+        .orElseThrow(() -> new PostException(INVALID_POST_ID));
 
     // 게시글 번호와 아이피가 redis 서버에 존재하지 않을 경우 조회수 증가
     String ip = request.getRemoteAddr();
@@ -87,18 +97,14 @@ public class PostService {
   @Transactional
   public PostDto updatePost(Long id, UpdatePostRequest request) {
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+        .orElseThrow(() -> new PostException(INVALID_POST_ID));
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     if (post.getMember() != member) {
-      throw new IllegalStateException("작성한 게시글이 아닙니다.");
-    }
-
-    if (Boolean.TRUE.equals(post.isBlind()) || post.getDeleteDateTime() != null) {
-      throw new IllegalStateException("수정할 수 없는 게시글입니다.");
+      throw new PostException(NOT_OWN_POST);
     }
 
     post.update(request.getTitle(), request.getContent());
@@ -110,18 +116,18 @@ public class PostService {
   @Transactional
   public PostDto deletePost(Long id) {
     Post post = postRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+        .orElseThrow(() -> new PostException(INVALID_POST_ID));
 
     if (post.getDeleteDateTime() != null) {
-      throw new IllegalStateException("이미 삭제된 게시글입니다.");
+      throw new PostException(ALREADY_DELETE_POST);
     }
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     if (post.getMember() != member) {
-      throw new IllegalStateException("작성한 게시글이 아닙니다.");
+      throw new PostException(NOT_OWN_POST);
     }
 
     post.delete();
@@ -144,7 +150,7 @@ public class PostService {
   @Transactional(readOnly = true)
   public List<PostDto> getAllCategoryPost(Long categoryId, int page, int size) {
     Category category = categoryRepository.findById(categoryId)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 카테고리 번호입니다."));
+        .orElseThrow(() -> new CategoryException(INVALID_CATEGORY_ID));
 
     Sort sort = Sort.by(Sort.Direction.DESC, "id");
     Pageable pageable = PageRequest.of(page, size, sort);
