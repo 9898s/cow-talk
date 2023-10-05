@@ -46,4 +46,11 @@ public class Reply extends BaseTimeEntity {
 
   @Column
   private LocalDateTime deleteDateTime;
+
+  public Reply update(String content) {
+    this.content = content;
+    this.updateDateTime = LocalDateTime.now();
+
+    return this;
+  }
 }
