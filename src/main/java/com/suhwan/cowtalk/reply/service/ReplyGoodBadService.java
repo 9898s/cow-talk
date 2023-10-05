@@ -36,9 +36,9 @@ public class ReplyGoodBadService {
     Member member = memberRepository.findByEmail(email)
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
 
-//    if (reply.getMember() == member) {
-//      throw new IllegalStateException("자신이 작성한 대댓글에 좋아요/싫어요를 누를 수 없습니다.");
-//    }
+    if (reply.getMember() == member) {
+      throw new IllegalStateException("자신이 작성한 대댓글에 좋아요/싫어요를 누를 수 없습니다.");
+    }
 
     String replyGoodBadId = getString(id, reply, member);
 
@@ -86,5 +86,12 @@ public class ReplyGoodBadService {
             .memberId(member.getId())
             .build()
     );
+  }
+
+  public Long countGoodBad(Long id, GoodBad goodBad) {
+    Reply reply = replyRepository.findById(id)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 대댓글 번호입니다."));
+
+    return replyGoodBadRepository.countByReplyAndGoodBad(reply, goodBad);
   }
 }

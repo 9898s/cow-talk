@@ -10,6 +10,8 @@ import com.suhwan.cowtalk.reply.model.ReplyDto;
 import com.suhwan.cowtalk.reply.model.UpdateReplyRequest;
 import com.suhwan.cowtalk.reply.model.WriteReplyRequest;
 import com.suhwan.cowtalk.reply.repository.ReplyRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +24,7 @@ public class ReplyService {
   private final CommentRepository commentRepository;
   private final MemberRepository memberRepository;
 
-  // 답댓글 쓰기
+  // 대댓글 쓰기
   public ReplyDto writeReply(WriteReplyRequest request) {
     Comment comment = commentRepository.findById(request.getCommentId())
         .orElseThrow(() -> new IllegalStateException("찾을 수 없는 댓글 번호입니다."));
@@ -40,6 +42,19 @@ public class ReplyService {
                 .build()
         )
     );
+  }
+
+  // 댓글 대댓글 조회
+  @Transactional(readOnly = true)
+  public List<ReplyDto> getCommentReply(Long commentId) {
+    Comment comment = commentRepository.findById(commentId)
+        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 댓글 번호입니다."));
+
+    List<Reply> replyList = replyRepository.findAllByComment(comment);
+
+    return replyList.stream()
+        .map(ReplyDto::fromEntity)
+        .collect(Collectors.toList());
   }
 
   @Transactional
@@ -60,7 +75,7 @@ public class ReplyService {
     return ReplyDto.fromEntity(reply);
   }
 
-  // 댓글 삭제
+  // 대댓글 삭제
   @Transactional
   public ReplyDto deleteReply(Long id) {
     Reply reply = replyRepository.findById(id)
