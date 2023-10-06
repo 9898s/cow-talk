@@ -1,8 +1,14 @@
 package com.suhwan.cowtalk.coin.service;
 
+import static com.suhwan.cowtalk.common.type.ErrorCode.ALREADY_DELETE_COIN_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_COIN_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_EXCHANGE_ID;
+
 import com.suhwan.cowtalk.coin.entity.Coin;
 import com.suhwan.cowtalk.coin.model.CoinDto;
 import com.suhwan.cowtalk.coin.repository.CoinRepository;
+import com.suhwan.cowtalk.common.exception.CoinException;
+import com.suhwan.cowtalk.common.exception.ExchangeException;
 import com.suhwan.cowtalk.exchange.entity.Exchange;
 import com.suhwan.cowtalk.exchange.repository.ExchangeRepository;
 import java.util.List;
@@ -25,7 +31,7 @@ public class CoinService {
   @Transactional(readOnly = true)
   public CoinDto getCoin(Long id) {
     Coin coin = coinRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 코인 번호입니다."));
+        .orElseThrow(() -> new CoinException(INVALID_COIN_ID));
 
     return CoinDto.fromEntity(coin);
   }
@@ -33,7 +39,7 @@ public class CoinService {
   // 거래소에 상장된 코인 조회
   public List<CoinDto> getCoinList(Long exchangeId, int page, int size) {
     Exchange exchange = exchangeRepository.findById(exchangeId)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 거래소 번호입니다."));
+        .orElseThrow(() -> new ExchangeException(INVALID_EXCHANGE_ID));
 
     Pageable pageable = PageRequest.of(page, size);
     Page<Coin> coinPage = coinRepository.findAllByExchange(exchange, pageable);
@@ -47,10 +53,10 @@ public class CoinService {
   @Transactional
   public CoinDto deleteCoin(Long id) {
     Coin coin = coinRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 코인 번호입니다."));
+        .orElseThrow(() -> new CoinException(INVALID_COIN_ID));
 
     if (coin.getDeleteDateTime() != null) {
-      throw new IllegalStateException("이미 삭제된 코인 번호입니다.");
+      throw new CoinException(ALREADY_DELETE_COIN_ID);
     }
 
     coin.delete();

@@ -1,10 +1,19 @@
 package com.suhwan.cowtalk.comment.service;
 
+import static com.suhwan.cowtalk.common.type.ErrorCode.ALREADY_DELETE_COMMENT;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_COMMENT_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_MEMBER_EMAIL;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_POST_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.NOT_OWN_COMMENT;
+
 import com.suhwan.cowtalk.comment.entity.Comment;
 import com.suhwan.cowtalk.comment.model.CommentDto;
 import com.suhwan.cowtalk.comment.model.UpdateCommentRequest;
 import com.suhwan.cowtalk.comment.model.WriteCommentRequest;
 import com.suhwan.cowtalk.comment.repository.CommentRepository;
+import com.suhwan.cowtalk.common.exception.CommentException;
+import com.suhwan.cowtalk.common.exception.MemberException;
+import com.suhwan.cowtalk.common.exception.PostException;
 import com.suhwan.cowtalk.common.security.SecurityUtil;
 import com.suhwan.cowtalk.member.entity.Member;
 import com.suhwan.cowtalk.member.repository.MemberRepository;
@@ -27,11 +36,11 @@ public class CommentService {
   // 댓글 작성
   public CommentDto writeComment(WriteCommentRequest request) {
     Post post = postRepository.findById(request.getPostId())
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+        .orElseThrow(() -> new PostException(INVALID_POST_ID));
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     return CommentDto.fromEntity(
         commentRepository.save(
@@ -48,7 +57,7 @@ public class CommentService {
   @Transactional(readOnly = true)
   public List<CommentDto> getPostComment(Long postId) {
     Post post = postRepository.findById(postId)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 게시글 번호입니다."));
+        .orElseThrow(() -> new PostException(INVALID_POST_ID));
 
     List<Comment> commentList = commentRepository.findAllByPost(post);
 
@@ -61,14 +70,14 @@ public class CommentService {
   @Transactional
   public CommentDto updateComment(Long id, UpdateCommentRequest request) {
     Comment comment = commentRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 댓글 번호입니다."));
+        .orElseThrow(() -> new CommentException(INVALID_COMMENT_ID));
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     if (comment.getMember() != member) {
-      throw new IllegalStateException("본인이 작성한 댓글이 아닙니다.");
+      throw new CommentException(NOT_OWN_COMMENT);
     }
 
     comment.update(request.getContent());
@@ -80,17 +89,17 @@ public class CommentService {
   @Transactional
   public CommentDto deleteComment(Long id) {
     Comment comment = commentRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 댓글 번호입니다."));
+        .orElseThrow(() -> new CommentException(INVALID_COMMENT_ID));
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     if (comment.getMember() != member) {
-      throw new IllegalStateException("본인이 작성한 댓글이 아닙니다.");
+      throw new CommentException(NOT_OWN_COMMENT);
     }
     if (comment.getDeleteDateTime() != null) {
-      throw new IllegalStateException("이미 삭제된 댓글입니다.");
+      throw new CommentException(ALREADY_DELETE_COMMENT);
     }
 
     comment.delete();
