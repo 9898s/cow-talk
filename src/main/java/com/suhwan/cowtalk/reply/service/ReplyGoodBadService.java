@@ -47,7 +47,7 @@ public class ReplyGoodBadService {
       throw new ReplyException(CANNOT_GOOD_BAD_OWN_REPLY);
     }
 
-    String replyGoodBadId = getString(id, reply, member);
+    String replyGoodBadId = generateAndValidateReplyGoodBadId(id, reply, member);
 
     // 블라인드 처리
     if (!reply.isBlind() &&
@@ -69,7 +69,7 @@ public class ReplyGoodBadService {
     );
   }
 
-  private String getString(Long id, Reply reply, Member member) {
+  private String generateAndValidateReplyGoodBadId(Long id, Reply reply, Member member) {
     String replyGoodBadId = id + ":" + member.getId();
     if (replyGoodBadCacheRepository.existsById(replyGoodBadId)) {
       throw new ReplyException(ALREADY_GOOD_BAD_REPLY);

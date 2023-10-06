@@ -1,7 +1,16 @@
 package com.suhwan.cowtalk.reply.service;
 
+import static com.suhwan.cowtalk.common.type.ErrorCode.ALREADY_DELETE_REPLY;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_COMMENT_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_MEMBER_EMAIL;
+import static com.suhwan.cowtalk.common.type.ErrorCode.INVALID_REPLY_ID;
+import static com.suhwan.cowtalk.common.type.ErrorCode.NOT_OWN_REPLY;
+
 import com.suhwan.cowtalk.comment.entity.Comment;
 import com.suhwan.cowtalk.comment.repository.CommentRepository;
+import com.suhwan.cowtalk.common.exception.CommentException;
+import com.suhwan.cowtalk.common.exception.MemberException;
+import com.suhwan.cowtalk.common.exception.ReplyException;
 import com.suhwan.cowtalk.common.security.SecurityUtil;
 import com.suhwan.cowtalk.member.entity.Member;
 import com.suhwan.cowtalk.member.repository.MemberRepository;
@@ -27,11 +36,11 @@ public class ReplyService {
   // 대댓글 쓰기
   public ReplyDto writeReply(WriteReplyRequest request) {
     Comment comment = commentRepository.findById(request.getCommentId())
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 댓글 번호입니다."));
+        .orElseThrow(() -> new CommentException(INVALID_COMMENT_ID));
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     return ReplyDto.fromEntity(
         replyRepository.save(
@@ -48,7 +57,7 @@ public class ReplyService {
   @Transactional(readOnly = true)
   public List<ReplyDto> getCommentReply(Long commentId) {
     Comment comment = commentRepository.findById(commentId)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 댓글 번호입니다."));
+        .orElseThrow(() -> new CommentException(INVALID_COMMENT_ID));
 
     List<Reply> replyList = replyRepository.findAllByComment(comment);
 
@@ -60,14 +69,14 @@ public class ReplyService {
   @Transactional
   public ReplyDto updateReply(Long id, UpdateReplyRequest request) {
     Reply reply = replyRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 대댓글 번호입니다."));
+        .orElseThrow(() -> new ReplyException(INVALID_REPLY_ID));
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     if (reply.getMember() != member) {
-      throw new IllegalStateException("본인이 작성한 대댓글이 아닙니다.");
+      throw new ReplyException(NOT_OWN_REPLY);
     }
 
     reply.update(request.getContent());
@@ -79,17 +88,17 @@ public class ReplyService {
   @Transactional
   public ReplyDto deleteReply(Long id) {
     Reply reply = replyRepository.findById(id)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 대댓글 번호입니다."));
+        .orElseThrow(() -> new ReplyException(INVALID_REPLY_ID));
 
     String email = SecurityUtil.getLoginMemberEmail();
     Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalStateException("찾을 수 없는 멤버 이메일입니다."));
+        .orElseThrow(() -> new MemberException(INVALID_MEMBER_EMAIL));
 
     if (reply.getMember() != member) {
-      throw new IllegalStateException("본인이 작성한 대댓글이 아닙니다.");
+      throw new ReplyException(NOT_OWN_REPLY);
     }
     if (reply.getDeleteDateTime() != null) {
-      throw new IllegalStateException("이미 삭제된 댓글입니다.");
+      throw new ReplyException(ALREADY_DELETE_REPLY);
     }
 
     reply.delete();

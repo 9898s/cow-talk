@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     ErrorResponse errorResponse = new ErrorResponse(exception.getErrorCode(),
         exception.getErrorMessage());
 
-    return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @ExceptionHandler(ExchangeException.class)

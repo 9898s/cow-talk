@@ -47,7 +47,7 @@ public class CommentGoodBadService {
       throw new CommentException(CANNOT_GOOD_BAD_OWN_COMMENT);
     }
 
-    String commentGoodBadId = getString(id, comment, member);
+    String commentGoodBadId = generateAndValidateCommentGoodBadId(id, comment, member);
 
     // 블라인드 처리
     if (!comment.isBlind() &&
@@ -69,7 +69,7 @@ public class CommentGoodBadService {
     );
   }
 
-  private String getString(Long id, Comment comment, Member member) {
+  private String generateAndValidateCommentGoodBadId(Long id, Comment comment, Member member) {
     String commentGoodBadId = id + ":" + member.getId();
     if (commentGoodBadCacheRepository.existsById(commentGoodBadId)) {
       throw new CommentException(ALREADY_GOOD_BAD_COMMENT);
