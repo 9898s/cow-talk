@@ -2,6 +2,7 @@ package com.suhwan.cowtalk.post.model;
 
 import com.suhwan.cowtalk.category.entity.Category;
 import com.suhwan.cowtalk.member.entity.Member;
+import com.suhwan.cowtalk.post.document.ElasticSearchPost;
 import com.suhwan.cowtalk.post.entity.Post;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,18 @@ public class PostDto {
         .createDateTime(post.getCreateDateTime())
         .updateDateTime(post.getUpdateDateTime())
         .deleteDateTime(post.getDeleteDateTime())
+        .build();
+  }
+
+  public static PostDto fromDocument(ElasticSearchPost post) {
+
+    return PostDto.builder()
+        .id(post.getId())
+        .title(post.getTitle())
+        .content(post.getContent())
+        .view(post.getView())
+        .isBlind(post.isBlind())
+        .member(post.getMember())
         .build();
   }
 }

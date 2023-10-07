@@ -6,6 +6,7 @@ import com.suhwan.cowtalk.post.model.DeletePostResponse;
 import com.suhwan.cowtalk.post.model.PagePostResponse;
 import com.suhwan.cowtalk.post.model.PostDto;
 import com.suhwan.cowtalk.post.model.PostResponse;
+import com.suhwan.cowtalk.post.model.SearchPostResponse;
 import com.suhwan.cowtalk.post.model.UpdatePostRequest;
 import com.suhwan.cowtalk.post.model.UpdatePostResponse;
 import com.suhwan.cowtalk.post.model.WritePostRequest;
@@ -14,9 +15,12 @@ import com.suhwan.cowtalk.post.model.goodbad.GoodBadPostResponse;
 import com.suhwan.cowtalk.post.model.goodbad.PostGoodBadDto;
 import com.suhwan.cowtalk.post.service.PostApiService;
 import com.suhwan.cowtalk.post.service.PostGoodBadService;
+import com.suhwan.cowtalk.post.service.PostSearchService;
 import com.suhwan.cowtalk.post.service.PostService;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +42,7 @@ public class PostController {
   private final PostService postService;
   private final PostGoodBadService postGoodBadService;
   private final PostApiService postApiService;
+  private final PostSearchService postSearchService;
 
   @PostMapping
   public ResponseEntity<?> writePost(@RequestBody WritePostRequest request) {
@@ -157,5 +162,24 @@ public class PostController {
 
     return ResponseEntity.ok().body(
         PagePostResponse.of(postResponseList.size(), page, size, postResponseList));
+  }
+
+  @GetMapping("/search")
+  public ResponseEntity<?> searchPost(
+      @RequestParam(required = false) String nickname,
+      @RequestParam(required = false) String title) {
+
+    List<PostDto> postDtoList = new ArrayList<>();
+    if (nickname != null) {
+      postDtoList = postSearchService.searchNickname(nickname);
+    } else if (title != null) {
+      postDtoList = postSearchService.searchTitle(title);
+    }
+
+    List<SearchPostResponse> searchPostResponseList = postDtoList.stream()
+        .map(SearchPostResponse::from)
+        .collect(Collectors.toList());
+
+    return ResponseEntity.ok().body(searchPostResponseList);
   }
 }
